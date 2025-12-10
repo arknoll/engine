@@ -376,18 +376,12 @@ class XrManager extends EventHandler {
 				}
 				this._camera.camera._node.setLocalPosition(this._localPosition);
 				this._camera.camera._node.setLocalRotation(this._localRotation);
+				const node = this._camera.camera._node;
+				if (!node.localPosition._dbgId) node.localPosition._dbgId = 'XR_' + Date.now();
 				if (!this._lastXrPosLog || Date.now() - this._lastXrPosLog > 1000) {
 						this._lastXrPosLog = Date.now();
-						const node = this._camera.camera._node;
-						const directLocalPos = node.localPosition;
-						const localPos = node.getLocalPosition();
-						node.getPosition();
-						const nodeId = node._guid || node.name;
-						console.log(`🎯 XR Manager - Node "${nodeId}" (parent: ${node.parent?.name || 'null'})`);
-						console.log(`   Setting _localPosition: (${this._localPosition.x.toFixed(3)}, ${this._localPosition.y.toFixed(3)}, ${this._localPosition.z.toFixed(3)})`);
-						console.log(`   Direct localPosition: (${directLocalPos.x.toFixed(3)}, ${directLocalPos.y.toFixed(3)}, ${directLocalPos.z.toFixed(3)})`);
-						console.log(`   getLocalPosition(): (${localPos.x.toFixed(3)}, ${localPos.y.toFixed(3)}, ${localPos.z.toFixed(3)})`);
-						console.log(`   localPosition === getLocalPosition: ${directLocalPos === localPos}`);
+						const lp = node.localPosition;
+						console.log(`🎯 XR: Vec3ID=${lp._dbgId} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
 				}
 				this.input.update(frame);
 				if (this._type === XRTYPE_AR) {

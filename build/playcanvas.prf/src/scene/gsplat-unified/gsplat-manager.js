@@ -289,16 +289,9 @@ class GSplatManager {
 								cameraRotated = angle > rotThreshold;
 								if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
 										this._lastFwdLogTime = Date.now();
-										const directLocalPos = this.cameraNode.localPosition;
-										const localPos = this.cameraNode.getLocalPosition();
-										const pos = this.cameraNode.getPosition();
-										const parentName = this.cameraNode.parent ? this.cameraNode.parent.name : 'NO PARENT';
-										const nodeId = this.cameraNode._guid || this.cameraNode.name;
-										console.log(`🎥 GSplatMgr Camera "${nodeId}" (parent: ${parentName})`);
-										console.log(`   Direct localPosition: (${directLocalPos.x.toFixed(3)}, ${directLocalPos.y.toFixed(3)}, ${directLocalPos.z.toFixed(3)})`);
-										console.log(`   getLocalPosition(): (${localPos.x.toFixed(3)}, ${localPos.y.toFixed(3)}, ${localPos.z.toFixed(3)})`);
-										console.log(`   getPosition(): (${pos.x.toFixed(3)}, ${pos.y.toFixed(3)}, ${pos.z.toFixed(3)})`);
-										console.log(`   localPosition === getLocalPosition: ${directLocalPos === localPos}`);
+										const lp = this.cameraNode.localPosition;
+										const wp = this.cameraNode.getPosition();
+										console.log(`🎥 GSplat: Vec3ID=${lp._dbgId || 'NONE'} local=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)}) world=(${wp.x.toFixed(3)}, ${wp.y.toFixed(3)}, ${wp.z.toFixed(3)})`);
 								}
 						} else {
 								cameraRotated = true;

@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision deed7f2d8 (PROFILE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision b913cc32d (PROFILE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = 'deed7f2d8';
+const revision = 'b913cc32d';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -79341,16 +79341,9 @@ class GSplatManager {
 								cameraRotated = angle > rotThreshold;
 								if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
 										this._lastFwdLogTime = Date.now();
-										const directLocalPos = this.cameraNode.localPosition;
-										const localPos = this.cameraNode.getLocalPosition();
-										const pos = this.cameraNode.getPosition();
-										const parentName = this.cameraNode.parent ? this.cameraNode.parent.name : 'NO PARENT';
-										const nodeId = this.cameraNode._guid || this.cameraNode.name;
-										console.log(`🎥 GSplatMgr Camera "${nodeId}" (parent: ${parentName})`);
-										console.log(`   Direct localPosition: (${directLocalPos.x.toFixed(3)}, ${directLocalPos.y.toFixed(3)}, ${directLocalPos.z.toFixed(3)})`);
-										console.log(`   getLocalPosition(): (${localPos.x.toFixed(3)}, ${localPos.y.toFixed(3)}, ${localPos.z.toFixed(3)})`);
-										console.log(`   getPosition(): (${pos.x.toFixed(3)}, ${pos.y.toFixed(3)}, ${pos.z.toFixed(3)})`);
-										console.log(`   localPosition === getLocalPosition: ${directLocalPos === localPos}`);
+										const lp = this.cameraNode.localPosition;
+										const wp = this.cameraNode.getPosition();
+										console.log(`🎥 GSplat: Vec3ID=${lp._dbgId || 'NONE'} local=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)}) world=(${wp.x.toFixed(3)}, ${wp.y.toFixed(3)}, ${wp.z.toFixed(3)})`);
 								}
 						} else {
 								cameraRotated = true;
@@ -92567,18 +92560,12 @@ class XrManager extends EventHandler {
 				}
 				this._camera.camera._node.setLocalPosition(this._localPosition);
 				this._camera.camera._node.setLocalRotation(this._localRotation);
+				const node = this._camera.camera._node;
+				if (!node.localPosition._dbgId) node.localPosition._dbgId = 'XR_' + Date.now();
 				if (!this._lastXrPosLog || Date.now() - this._lastXrPosLog > 1000) {
 						this._lastXrPosLog = Date.now();
-						const node = this._camera.camera._node;
-						const directLocalPos = node.localPosition;
-						const localPos = node.getLocalPosition();
-						node.getPosition();
-						const nodeId = node._guid || node.name;
-						console.log(`🎯 XR Manager - Node "${nodeId}" (parent: ${node.parent?.name || 'null'})`);
-						console.log(`   Setting _localPosition: (${this._localPosition.x.toFixed(3)}, ${this._localPosition.y.toFixed(3)}, ${this._localPosition.z.toFixed(3)})`);
-						console.log(`   Direct localPosition: (${directLocalPos.x.toFixed(3)}, ${directLocalPos.y.toFixed(3)}, ${directLocalPos.z.toFixed(3)})`);
-						console.log(`   getLocalPosition(): (${localPos.x.toFixed(3)}, ${localPos.y.toFixed(3)}, ${localPos.z.toFixed(3)})`);
-						console.log(`   localPosition === getLocalPosition: ${directLocalPos === localPos}`);
+						const lp = node.localPosition;
+						console.log(`🎯 XR: Vec3ID=${lp._dbgId} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
 				}
 				this.input.update(frame);
 				if (this._type === XRTYPE_AR) {
