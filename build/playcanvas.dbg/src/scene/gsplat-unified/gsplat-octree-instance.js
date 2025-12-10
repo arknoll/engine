@@ -362,6 +362,7 @@ class GSplatOctreeInstance {
             55,
             60
         ];
+        console.log('🔍 updateLod called - placement.lodDistances:', this.placement.lodDistances, 'using:', lodDistances, 'maxLod:', maxLod);
         // Clamp configured LOD range to valid bounds [0, maxLod] and ensure min <= max
         const { lodRangeMin, lodRangeMax } = params;
         const rangeMin = Math.max(0, Math.min(lodRangeMin ?? 0, maxLod));
@@ -392,6 +393,13 @@ class GSplatOctreeInstance {
      * @private
      */ evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params) {
         const { lodBehindPenalty } = params;
+        // Debug: log LOD parameters once per update
+        if (!this._lastLoggedLodDistances || JSON.stringify(this._lastLoggedLodDistances) !== JSON.stringify(lodDistances)) {
+            console.log('📏 evaluateNodeLods - lodDistances:', lodDistances, 'maxLod:', maxLod, 'rangeMin:', rangeMin, 'rangeMax:', rangeMax);
+            this._lastLoggedLodDistances = [
+                ...lodDistances
+            ];
+        }
         // transform camera position to octree local space
         const worldCameraPosition = cameraNode.getPosition();
         const octreeWorldTransform = this.placement.node.getWorldTransform();
@@ -448,6 +456,13 @@ class GSplatOctreeInstance {
                 totalSplats += lod.count;
             }
         }
+        // Debug: log LOD distribution
+        const lodCounts = {};
+        for(let i = 0; i < nodeInfos.length; i++){
+            const lod = nodeInfos[i].optimalLod;
+            lodCounts[lod] = (lodCounts[lod] || 0) + 1;
+        }
+        console.log('🎨 LOD distribution:', lodCounts, 'totalSplats:', totalSplats);
         return totalSplats;
     }
     /**

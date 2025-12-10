@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 2f5a69cc8 (PROFILE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision c32799480 (PROFILE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = '2f5a69cc8';
+const revision = 'c32799480';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -78448,6 +78448,7 @@ class GSplatOctreeInstance {
 						55,
 						60
 				];
+				console.log('🔍 updateLod called - placement.lodDistances:', this.placement.lodDistances, 'using:', lodDistances, 'maxLod:', maxLod);
 				const { lodRangeMin, lodRangeMax } = params;
 				const rangeMin = Math.max(0, Math.min(lodRangeMin ?? 0, maxLod));
 				const rangeMax = Math.max(rangeMin, Math.min(lodRangeMax ?? maxLod, maxLod));
@@ -78462,6 +78463,12 @@ class GSplatOctreeInstance {
 		}
 		evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params) {
 				const { lodBehindPenalty } = params;
+				if (!this._lastLoggedLodDistances || JSON.stringify(this._lastLoggedLodDistances) !== JSON.stringify(lodDistances)) {
+						console.log('📏 evaluateNodeLods - lodDistances:', lodDistances, 'maxLod:', maxLod, 'rangeMin:', rangeMin, 'rangeMax:', rangeMax);
+						this._lastLoggedLodDistances = [
+								...lodDistances
+						];
+				}
 				const worldCameraPosition = cameraNode.getPosition();
 				const octreeWorldTransform = this.placement.node.getWorldTransform();
 				_invWorldMat.copy(octreeWorldTransform).invert();
@@ -78506,6 +78513,12 @@ class GSplatOctreeInstance {
 								totalSplats += lod.count;
 						}
 				}
+				const lodCounts = {};
+				for(let i = 0; i < nodeInfos.length; i++){
+						const lod = nodeInfos[i].optimalLod;
+						lodCounts[lod] = (lodCounts[lod] || 0) + 1;
+				}
+				console.log('🎨 LOD distribution:', lodCounts, 'totalSplats:', totalSplats);
 				return totalSplats;
 		}
 		enforceSplatBudget(totalSplats, splatBudget, rangeMin, rangeMax) {
@@ -79861,9 +79874,13 @@ class GSplatComponent extends Component {
 				return this._castShadows;
 		}
 		set lodDistances(value) {
+				console.log(`📐 GSplatComponent.lodDistances SET:`, value, 'entity:', this.entity?.name);
 				this._lodDistances = Array.isArray(value) ? value.slice() : null;
 				if (this._placement) {
 						this._placement.lodDistances = this._lodDistances;
+						console.log(`   → Applied to placement`);
+				} else {
+						console.log(`   ⚠️ No placement yet`);
 				}
 		}
 		get lodDistances() {

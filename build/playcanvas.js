@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 2f5a69cc8 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision c32799480 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = '2f5a69cc8';
+	var revision = 'c32799480';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -77797,6 +77797,7 @@
 							55,
 							60
 					];
+					console.log('🔍 updateLod called - placement.lodDistances:', this.placement.lodDistances, 'using:', lodDistances, 'maxLod:', maxLod);
 					var lodRangeMin = params.lodRangeMin, lodRangeMax = params.lodRangeMax;
 					var rangeMin = Math.max(0, Math.min(lodRangeMin != null ? lodRangeMin : 0, maxLod));
 					var rangeMax = Math.max(rangeMin, Math.min(lodRangeMax != null ? lodRangeMax : maxLod, maxLod));
@@ -77811,6 +77812,10 @@
 			};
 			_proto.evaluateNodeLods = function evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params) {
 					var lodBehindPenalty = params.lodBehindPenalty;
+					if (!this._lastLoggedLodDistances || JSON.stringify(this._lastLoggedLodDistances) !== JSON.stringify(lodDistances)) {
+							console.log('📏 evaluateNodeLods - lodDistances:', lodDistances, 'maxLod:', maxLod, 'rangeMin:', rangeMin, 'rangeMax:', rangeMax);
+							this._lastLoggedLodDistances = [].concat(lodDistances);
+					}
 					var worldCameraPosition = cameraNode.getPosition();
 					var octreeWorldTransform = this.placement.node.getWorldTransform();
 					_invWorldMat.copy(octreeWorldTransform).invert();
@@ -77855,6 +77860,12 @@
 									totalSplats += lod1.count;
 							}
 					}
+					var lodCounts = {};
+					for(var i = 0; i < nodeInfos.length; i++){
+							var lod2 = nodeInfos[i].optimalLod;
+							lodCounts[lod2] = (lodCounts[lod2] || 0) + 1;
+					}
+					console.log('🎨 LOD distribution:', lodCounts, 'totalSplats:', totalSplats);
 					return totalSplats;
 			};
 			_proto.enforceSplatBudget = function enforceSplatBudget(totalSplats, splatBudget, rangeMin, rangeMax) {
@@ -79743,9 +79754,14 @@
 									return this._lodDistances ? this._lodDistances.slice() : null;
 							},
 							set: function set(value) {
+									var _this_entity;
+									console.log("\uD83D\uDCD0 GSplatComponent.lodDistances SET:", value, 'entity:', (_this_entity = this.entity) == null ? void 0 : _this_entity.name);
 									this._lodDistances = Array.isArray(value) ? value.slice() : null;
 									if (this._placement) {
 											this._placement.lodDistances = this._lodDistances;
+											console.log("   → Applied to placement");
+									} else {
+											console.log("   ⚠️ No placement yet");
 									}
 							}
 					},

@@ -131,9 +131,13 @@ class GSplatComponent extends Component {
 				return this._castShadows;
 		}
 		set lodDistances(value) {
+				console.log(`📐 GSplatComponent.lodDistances SET:`, value, 'entity:', this.entity?.name);
 				this._lodDistances = Array.isArray(value) ? value.slice() : null;
 				if (this._placement) {
 						this._placement.lodDistances = this._lodDistances;
+						console.log(`   → Applied to placement`);
+				} else {
+						console.log(`   ⚠️ No placement yet`);
 				}
 		}
 		get lodDistances() {
