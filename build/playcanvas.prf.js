@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 9fe0a5c22 (PROFILE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision cd677d468 (PROFILE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = '9fe0a5c22';
+	var revision = 'cd677d468';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -78068,7 +78068,7 @@
 													var currentLod = node.lods[currentOptimalLod];
 													var nextLod = node.lods[currentOptimalLod + 1];
 													var splatsSaved = currentLod.count - nextLod.count;
-													console.log("\uD83D\uDD22 Degrading node from LOD " + currentOptimalLod + " to " + (currentOptimalLod + 1) + ": " + splatsSaved + " splats saved");
+													console.log("\uD83D\uDD22 Degrading node index " + nodeIndex + " from LOD " + currentOptimalLod + " to " + (currentOptimalLod + 1) + ": " + splatsSaved + " splats saved");
 													nodeInfo.optimalLod += lodDelta;
 													currentSplats -= splatsSaved;
 													modified = true;
