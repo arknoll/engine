@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision cd677d468 (PROFILE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 2e02c4287 (PROFILE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = 'cd677d468';
+const revision = '2e02c4287';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -79342,10 +79342,13 @@ class GSplatManager {
 								if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
 										this._lastFwdLogTime = Date.now();
 										const pos = this.cameraNode.getPosition();
-										console.log(`🎥 Camera "${this.cameraNode.name}" pos: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})`);
+										const localPos = this.cameraNode.getLocalPosition();
+										const parentName = this.cameraNode.parent ? this.cameraNode.parent.name : 'NO PARENT';
+										console.log(`🎥 GSplatMgr Camera "${this.cameraNode.name}" (parent: ${parentName})`);
+										console.log(`   Local pos: (${localPos.x.toFixed(2)}, ${localPos.y.toFixed(2)}, ${localPos.z.toFixed(2)})`);
+										console.log(`   World pos: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})`);
 										console.log(`   Forward: (${currentCameraFwd.x.toFixed(3)}, ${currentCameraFwd.y.toFixed(3)}, ${currentCameraFwd.z.toFixed(3)})`);
-										console.log(`   Last fwd: (${this.lastLodCameraFwd.x.toFixed(3)}, ${this.lastLodCameraFwd.y.toFixed(3)}, ${this.lastLodCameraFwd.z.toFixed(3)})`);
-										console.log(`   Angle: ${(angle * 180 / Math.PI).toFixed(1)}°, threshold: ${lodUpdateAngleDeg}°, rotated: ${cameraRotated}`);
+										console.log(`   dirtyLocal: ${this.cameraNode._dirtyLocal}, dirtyWorld: ${this.cameraNode._dirtyWorld}`);
 								}
 						} else {
 								cameraRotated = true;
@@ -92562,6 +92565,16 @@ class XrManager extends EventHandler {
 				}
 				this._camera.camera._node.setLocalPosition(this._localPosition);
 				this._camera.camera._node.setLocalRotation(this._localRotation);
+				if (!this._lastXrPosLog || Date.now() - this._lastXrPosLog > 1000) {
+						this._lastXrPosLog = Date.now();
+						const node = this._camera.camera._node;
+						const localPos = node.getLocalPosition();
+						const worldPos = node.getPosition();
+						console.log(`🎯 XR Manager - Setting local: (${this._localPosition.x.toFixed(2)}, ${this._localPosition.y.toFixed(2)}, ${this._localPosition.z.toFixed(2)})`);
+						console.log(`   Node local after set: (${localPos.x.toFixed(2)}, ${localPos.y.toFixed(2)}, ${localPos.z.toFixed(2)})`);
+						console.log(`   Node world: (${worldPos.x.toFixed(2)}, ${worldPos.y.toFixed(2)}, ${worldPos.z.toFixed(2)})`);
+						console.log(`   Node parent: ${node.parent?.name || 'null'}`);
+				}
 				this.input.update(frame);
 				if (this._type === XRTYPE_AR) {
 						if (this.hitTest.supported) {

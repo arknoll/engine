@@ -933,6 +933,18 @@ class XrManager extends EventHandler {
         this._camera.camera._node.setLocalPosition(this._localPosition);
         this._camera.camera._node.setLocalRotation(this._localRotation);
 
+        // DEBUG: Log XR camera position updates
+        if (!this._lastXrPosLog || Date.now() - this._lastXrPosLog > 1000) {
+            this._lastXrPosLog = Date.now();
+            const node = this._camera.camera._node;
+            const localPos = node.getLocalPosition();
+            const worldPos = node.getPosition();
+            console.log(`🎯 XR Manager - Setting local: (${this._localPosition.x.toFixed(2)}, ${this._localPosition.y.toFixed(2)}, ${this._localPosition.z.toFixed(2)})`);
+            console.log(`   Node local after set: (${localPos.x.toFixed(2)}, ${localPos.y.toFixed(2)}, ${localPos.z.toFixed(2)})`);
+            console.log(`   Node world: (${worldPos.x.toFixed(2)}, ${worldPos.y.toFixed(2)}, ${worldPos.z.toFixed(2)})`);
+            console.log(`   Node parent: ${node.parent?.name || 'null'}`);
+        }
+
         this.input.update(frame);
 
         if (this._type === XRTYPE_AR) {

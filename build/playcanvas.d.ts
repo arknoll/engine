@@ -23236,6 +23236,7 @@ declare class XrManager extends EventHandler {
      * @ignore
      */
     update(frame: XRFrame): boolean;
+    _lastXrPosLog: number;
     /**
      * True if XR is supported.
      *

@@ -467,10 +467,13 @@ class GSplatManager {
                 if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
                     this._lastFwdLogTime = Date.now();
                     const pos = this.cameraNode.getPosition();
-                    console.log(`🎥 Camera "${this.cameraNode.name}" pos: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})`);
+                    const localPos = this.cameraNode.getLocalPosition();
+                    const parentName = this.cameraNode.parent ? this.cameraNode.parent.name : 'NO PARENT';
+                    console.log(`🎥 GSplatMgr Camera "${this.cameraNode.name}" (parent: ${parentName})`);
+                    console.log(`   Local pos: (${localPos.x.toFixed(2)}, ${localPos.y.toFixed(2)}, ${localPos.z.toFixed(2)})`);
+                    console.log(`   World pos: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})`);
                     console.log(`   Forward: (${currentCameraFwd.x.toFixed(3)}, ${currentCameraFwd.y.toFixed(3)}, ${currentCameraFwd.z.toFixed(3)})`);
-                    console.log(`   Last fwd: (${this.lastLodCameraFwd.x.toFixed(3)}, ${this.lastLodCameraFwd.y.toFixed(3)}, ${this.lastLodCameraFwd.z.toFixed(3)})`);
-                    console.log(`   Angle: ${(angle * 180 / Math.PI).toFixed(1)}°, threshold: ${lodUpdateAngleDeg}°, rotated: ${cameraRotated}`);
+                    console.log(`   dirtyLocal: ${this.cameraNode._dirtyLocal}, dirtyWorld: ${this.cameraNode._dirtyWorld}`);
                 }
             } else {
                 // first run, force update to initialize last orientation
