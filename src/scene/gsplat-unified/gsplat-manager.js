@@ -456,7 +456,6 @@ class GSplatManager {
         // rotation-based movement check (optional)
         let cameraRotated = false;
         const lodUpdateAngleDeg = this.scene.gsplat.lodUpdateAngle;
-        console.log('lodUpdateAngleDeg', lodUpdateAngleDeg);
         if (lodUpdateAngleDeg > 0) {
             if (Number.isFinite(this.lastLodCameraFwd.x)) {
                 const currentCameraFwd = this.cameraNode.forward;
@@ -464,7 +463,15 @@ class GSplatManager {
                 const angle = Math.acos(dot);
                 const rotThreshold = lodUpdateAngleDeg * math.DEG_TO_RAD;
                 cameraRotated = angle > rotThreshold;
-                console.log('cameraRotated', cameraRotated);
+                // Debug: log forward vectors to see if they're updating
+                if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
+                    this._lastFwdLogTime = Date.now();
+                    const pos = this.cameraNode.getPosition();
+                    console.log(`🎥 Camera "${this.cameraNode.name}" pos: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})`);
+                    console.log(`   Forward: (${currentCameraFwd.x.toFixed(3)}, ${currentCameraFwd.y.toFixed(3)}, ${currentCameraFwd.z.toFixed(3)})`);
+                    console.log(`   Last fwd: (${this.lastLodCameraFwd.x.toFixed(3)}, ${this.lastLodCameraFwd.y.toFixed(3)}, ${this.lastLodCameraFwd.z.toFixed(3)})`);
+                    console.log(`   Angle: ${(angle * 180 / Math.PI).toFixed(1)}°, threshold: ${lodUpdateAngleDeg}°, rotated: ${cameraRotated}`);
+                }
             } else {
                 // first run, force update to initialize last orientation
                 cameraRotated = true;

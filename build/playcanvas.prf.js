@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision c32799480 (PROFILE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 9fe0a5c22 (PROFILE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = 'c32799480';
+	var revision = '9fe0a5c22';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -79020,7 +79020,6 @@
 					}
 					var cameraRotated = false;
 					var lodUpdateAngleDeg = this.scene.gsplat.lodUpdateAngle;
-					console.log('lodUpdateAngleDeg', lodUpdateAngleDeg);
 					if (lodUpdateAngleDeg > 0) {
 							if (Number.isFinite(this.lastLodCameraFwd.x)) {
 									var currentCameraFwd = this.cameraNode.forward;
@@ -79028,7 +79027,14 @@
 									var angle = Math.acos(dot);
 									var rotThreshold = lodUpdateAngleDeg * math.DEG_TO_RAD;
 									cameraRotated = angle > rotThreshold;
-									console.log('cameraRotated', cameraRotated);
+									if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
+											this._lastFwdLogTime = Date.now();
+											var pos = this.cameraNode.getPosition();
+											console.log('\uD83C\uDFA5 Camera "' + this.cameraNode.name + '" pos: (' + pos.x.toFixed(2) + ", " + pos.y.toFixed(2) + ", " + pos.z.toFixed(2) + ")");
+											console.log("   Forward: (" + currentCameraFwd.x.toFixed(3) + ", " + currentCameraFwd.y.toFixed(3) + ", " + currentCameraFwd.z.toFixed(3) + ")");
+											console.log("   Last fwd: (" + this.lastLodCameraFwd.x.toFixed(3) + ", " + this.lastLodCameraFwd.y.toFixed(3) + ", " + this.lastLodCameraFwd.z.toFixed(3) + ")");
+											console.log("   Angle: " + (angle * 180 / Math.PI).toFixed(1) + "\xb0, threshold: " + lodUpdateAngleDeg + "\xb0, rotated: " + cameraRotated);
+									}
 							} else {
 									cameraRotated = true;
 							}
