@@ -466,14 +466,20 @@ class GSplatManager {
                 // Debug: log forward vectors to see if they're updating
                 if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
                     this._lastFwdLogTime = Date.now();
-                    const pos = this.cameraNode.getPosition();
+                    // Read localPosition DIRECTLY from the Vec3 property
+                    const directLocalPos = this.cameraNode.localPosition;
                     const localPos = this.cameraNode.getLocalPosition();
+                    const pos = this.cameraNode.getPosition();
                     const parentName = this.cameraNode.parent ? this.cameraNode.parent.name : 'NO PARENT';
-                    console.log(`🎥 GSplatMgr Camera "${this.cameraNode.name}" (parent: ${parentName})`);
-                    console.log(`   Local pos: (${localPos.x.toFixed(2)}, ${localPos.y.toFixed(2)}, ${localPos.z.toFixed(2)})`);
-                    console.log(`   World pos: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})`);
-                    console.log(`   Forward: (${currentCameraFwd.x.toFixed(3)}, ${currentCameraFwd.y.toFixed(3)}, ${currentCameraFwd.z.toFixed(3)})`);
-                    console.log(`   dirtyLocal: ${this.cameraNode._dirtyLocal}, dirtyWorld: ${this.cameraNode._dirtyWorld}`);
+                    
+                    // Check if cameraNode has _guid or some identifier
+                    const nodeId = this.cameraNode._guid || this.cameraNode.name;
+                    
+                    console.log(`🎥 GSplatMgr Camera "${nodeId}" (parent: ${parentName})`);
+                    console.log(`   Direct localPosition: (${directLocalPos.x.toFixed(3)}, ${directLocalPos.y.toFixed(3)}, ${directLocalPos.z.toFixed(3)})`);
+                    console.log(`   getLocalPosition(): (${localPos.x.toFixed(3)}, ${localPos.y.toFixed(3)}, ${localPos.z.toFixed(3)})`);
+                    console.log(`   getPosition(): (${pos.x.toFixed(3)}, ${pos.y.toFixed(3)}, ${pos.z.toFixed(3)})`);
+                    console.log(`   localPosition === getLocalPosition: ${directLocalPos === localPos}`);
                 }
             } else {
                 // first run, force update to initialize last orientation

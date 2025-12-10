@@ -937,12 +937,15 @@ class XrManager extends EventHandler {
         if (!this._lastXrPosLog || Date.now() - this._lastXrPosLog > 1000) {
             this._lastXrPosLog = Date.now();
             const node = this._camera.camera._node;
+            const directLocalPos = node.localPosition;
             const localPos = node.getLocalPosition();
             const worldPos = node.getPosition();
-            console.log(`🎯 XR Manager - Setting local: (${this._localPosition.x.toFixed(2)}, ${this._localPosition.y.toFixed(2)}, ${this._localPosition.z.toFixed(2)})`);
-            console.log(`   Node local after set: (${localPos.x.toFixed(2)}, ${localPos.y.toFixed(2)}, ${localPos.z.toFixed(2)})`);
-            console.log(`   Node world: (${worldPos.x.toFixed(2)}, ${worldPos.y.toFixed(2)}, ${worldPos.z.toFixed(2)})`);
-            console.log(`   Node parent: ${node.parent?.name || 'null'}`);
+            const nodeId = node._guid || node.name;
+            console.log(`🎯 XR Manager - Node "${nodeId}" (parent: ${node.parent?.name || 'null'})`);
+            console.log(`   Setting _localPosition: (${this._localPosition.x.toFixed(3)}, ${this._localPosition.y.toFixed(3)}, ${this._localPosition.z.toFixed(3)})`);
+            console.log(`   Direct localPosition: (${directLocalPos.x.toFixed(3)}, ${directLocalPos.y.toFixed(3)}, ${directLocalPos.z.toFixed(3)})`);
+            console.log(`   getLocalPosition(): (${localPos.x.toFixed(3)}, ${localPos.y.toFixed(3)}, ${localPos.z.toFixed(3)})`);
+            console.log(`   localPosition === getLocalPosition: ${directLocalPos === localPos}`);
         }
 
         this.input.update(frame);

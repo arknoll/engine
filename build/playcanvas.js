@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 2e02c4287 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision deed7f2d8 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = '2e02c4287';
+	var revision = 'deed7f2d8';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -78861,14 +78861,16 @@
 									cameraRotated = angle > rotThreshold;
 									if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
 											this._lastFwdLogTime = Date.now();
-											var pos = this.cameraNode.getPosition();
+											var directLocalPos = this.cameraNode.localPosition;
 											var localPos = this.cameraNode.getLocalPosition();
+											var pos = this.cameraNode.getPosition();
 											var parentName = this.cameraNode.parent ? this.cameraNode.parent.name : 'NO PARENT';
-											console.log('\uD83C\uDFA5 GSplatMgr Camera "' + this.cameraNode.name + '" (parent: ' + parentName + ")");
-											console.log("   Local pos: (" + localPos.x.toFixed(2) + ", " + localPos.y.toFixed(2) + ", " + localPos.z.toFixed(2) + ")");
-											console.log("   World pos: (" + pos.x.toFixed(2) + ", " + pos.y.toFixed(2) + ", " + pos.z.toFixed(2) + ")");
-											console.log("   Forward: (" + currentCameraFwd.x.toFixed(3) + ", " + currentCameraFwd.y.toFixed(3) + ", " + currentCameraFwd.z.toFixed(3) + ")");
-											console.log("   dirtyLocal: " + this.cameraNode._dirtyLocal + ", dirtyWorld: " + this.cameraNode._dirtyWorld);
+											var nodeId = this.cameraNode._guid || this.cameraNode.name;
+											console.log('\uD83C\uDFA5 GSplatMgr Camera "' + nodeId + '" (parent: ' + parentName + ")");
+											console.log("   Direct localPosition: (" + directLocalPos.x.toFixed(3) + ", " + directLocalPos.y.toFixed(3) + ", " + directLocalPos.z.toFixed(3) + ")");
+											console.log("   getLocalPosition(): (" + localPos.x.toFixed(3) + ", " + localPos.y.toFixed(3) + ", " + localPos.z.toFixed(3) + ")");
+											console.log("   getPosition(): (" + pos.x.toFixed(3) + ", " + pos.y.toFixed(3) + ", " + pos.z.toFixed(3) + ")");
+											console.log("   localPosition === getLocalPosition: " + (directLocalPos === localPos));
 									}
 							} else {
 									cameraRotated = true;
@@ -94595,12 +94597,15 @@
 							var _node_parent;
 							this._lastXrPosLog = Date.now();
 							var node = this._camera.camera._node;
+							var directLocalPos = node.localPosition;
 							var localPos = node.getLocalPosition();
-							var worldPos = node.getPosition();
-							console.log("\uD83C\uDFAF XR Manager - Setting local: (" + this._localPosition.x.toFixed(2) + ", " + this._localPosition.y.toFixed(2) + ", " + this._localPosition.z.toFixed(2) + ")");
-							console.log("   Node local after set: (" + localPos.x.toFixed(2) + ", " + localPos.y.toFixed(2) + ", " + localPos.z.toFixed(2) + ")");
-							console.log("   Node world: (" + worldPos.x.toFixed(2) + ", " + worldPos.y.toFixed(2) + ", " + worldPos.z.toFixed(2) + ")");
-							console.log("   Node parent: " + (((_node_parent = node.parent) == null ? void 0 : _node_parent.name) || 'null'));
+							node.getPosition();
+							var nodeId = node._guid || node.name;
+							console.log('\uD83C\uDFAF XR Manager - Node "' + nodeId + '" (parent: ' + (((_node_parent = node.parent) == null ? void 0 : _node_parent.name) || 'null') + ")");
+							console.log("   Setting _localPosition: (" + this._localPosition.x.toFixed(3) + ", " + this._localPosition.y.toFixed(3) + ", " + this._localPosition.z.toFixed(3) + ")");
+							console.log("   Direct localPosition: (" + directLocalPos.x.toFixed(3) + ", " + directLocalPos.y.toFixed(3) + ", " + directLocalPos.z.toFixed(3) + ")");
+							console.log("   getLocalPosition(): (" + localPos.x.toFixed(3) + ", " + localPos.y.toFixed(3) + ", " + localPos.z.toFixed(3) + ")");
+							console.log("   localPosition === getLocalPosition: " + (directLocalPos === localPos));
 					}
 					this.input.update(frame);
 					if (this._type === XRTYPE_AR) {
