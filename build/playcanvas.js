@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision b913cc32d (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 35f1b25ca (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = 'b913cc32d';
+	var revision = '35f1b25ca';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -78635,6 +78635,7 @@
 	var _randomColorRaw = null;
 	var GSplatManager = /*#__PURE__*/ function() {
 			function GSplatManager(device, director, layer, cameraNode) {
+					var _cameraNode_parent;
 					this.node = new GraphNode('GSplatManager');
 					this.worldStates = new Map();
 					this.lastWorldStateVersion = 0;
@@ -78659,6 +78660,9 @@
 					this.workBuffer = new GSplatWorkBuffer(device);
 					this.renderer = new GSplatRenderer(device, this.node, this.cameraNode, layer, this.workBuffer);
 					this.sorter = this.createSorter();
+					var lp = cameraNode.localPosition;
+					var parent = ((_cameraNode_parent = cameraNode.parent) == null ? void 0 : _cameraNode_parent.name) || 'null';
+					console.log("\uD83D\uDD27 GSplatManager CREATED: node=" + cameraNode._guid + " parent=" + parent + " localPos=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ")");
 			}
 			var _proto = GSplatManager.prototype;
 			_proto.setRenderMode = function setRenderMode(renderMode) {
@@ -79219,7 +79223,9 @@
 					return manager;
 			};
 			_proto.updateConfiguration = function updateConfiguration(device, director, layer, camera) {
+					var _cameraNode_parent;
 					var cameraNode = camera.node;
+					console.log("\uD83D\uDCF7 GSplatLayerData.updateConfiguration: camera.node._guid=" + (cameraNode == null ? void 0 : cameraNode._guid) + " parent=" + (cameraNode == null ? void 0 : (_cameraNode_parent = cameraNode.parent) == null ? void 0 : _cameraNode_parent.name));
 					var hasNormalPlacements = layer.gsplatPlacements.length > 0;
 					var hasShadowCasters = layer.gsplatShadowCasters.length > 0;
 					var setsEqual = SetUtils.equals(layer.gsplatPlacementsSet, layer.gsplatShadowCastersSet);

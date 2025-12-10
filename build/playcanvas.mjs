@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision b913cc32d (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 35f1b25ca (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = 'b913cc32d';
+const revision = '35f1b25ca';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -78982,6 +78982,9 @@ class GSplatManager {
 				this.workBuffer = new GSplatWorkBuffer(device);
 				this.renderer = new GSplatRenderer(device, this.node, this.cameraNode, layer, this.workBuffer);
 				this.sorter = this.createSorter();
+				const lp = cameraNode.localPosition;
+				const parent = cameraNode.parent?.name || 'null';
+				console.log(`🔧 GSplatManager CREATED: node=${cameraNode._guid} parent=${parent} localPos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
 		}
 		setRenderMode(renderMode) {
 				this.renderMode = renderMode;
@@ -79430,6 +79433,7 @@ class GSplatLayerData {
 		}
 		updateConfiguration(device, director, layer, camera) {
 				const cameraNode = camera.node;
+				console.log(`📷 GSplatLayerData.updateConfiguration: camera.node._guid=${cameraNode?._guid} parent=${cameraNode?.parent?.name}`);
 				const hasNormalPlacements = layer.gsplatPlacements.length > 0;
 				const hasShadowCasters = layer.gsplatShadowCasters.length > 0;
 				const setsEqual = SetUtils.equals(layer.gsplatPlacementsSet, layer.gsplatShadowCastersSet);

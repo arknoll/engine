@@ -103,6 +103,9 @@ class GSplatManager {
 				this.workBuffer = new GSplatWorkBuffer(device);
 				this.renderer = new GSplatRenderer(device, this.node, this.cameraNode, layer, this.workBuffer);
 				this.sorter = this.createSorter();
+				const lp = cameraNode.localPosition;
+				const parent = cameraNode.parent?.name || 'null';
+				console.log(`🔧 GSplatManager CREATED: node=${cameraNode._guid} parent=${parent} localPos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
 		}
 		setRenderMode(renderMode) {
 				this.renderMode = renderMode;

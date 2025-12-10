@@ -143,6 +143,10 @@ let _randomColorRaw = null;
         this.workBuffer = new GSplatWorkBuffer(device);
         this.renderer = new GSplatRenderer(device, this.node, this.cameraNode, layer, this.workBuffer);
         this.sorter = this.createSorter();
+        // Debug: log when GSplatManager is created
+        const lp = cameraNode.localPosition;
+        const parent = cameraNode.parent?.name || 'null';
+        console.log(`🔧 GSplatManager CREATED: node=${cameraNode._guid} parent=${parent} localPos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
     }
     /**
      * Sets the render mode for this manager and its renderer.
