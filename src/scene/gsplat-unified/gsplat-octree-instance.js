@@ -467,7 +467,10 @@ class GSplatOctreeInstance {
 
         // Enforce splat budget if enabled (bidirectional: degrade or upgrade)
         if (this.splatBudget > 0) {
+            console.log(`🔢 Before enforceSplatBudget: totalOptimalSplats=${totalOptimalSplats}, this.splatBudget=${this.splatBudget}`);
             this.enforceSplatBudget(totalOptimalSplats, this.splatBudget, rangeMin, rangeMax);
+        } else {
+            console.log(`⚠️ splatBudget is 0 or not set, skipping budget enforcement`);
         }
 
         // Pass 2: Calculate desired LOD (underfill) and apply changes
@@ -577,6 +580,7 @@ class GSplatOctreeInstance {
      * @private
      */
     enforceSplatBudget(totalSplats, splatBudget, rangeMin, rangeMax) {
+        console.log(`🎯 enforceSplatBudget called: totalSplats=${totalSplats}, splatBudget=${splatBudget}, rangeMin=${rangeMin}, rangeMax=${rangeMax}`);
         const nodes = this.octree.nodes;
         const nodeInfos = this.nodeInfos;
 
@@ -928,6 +932,7 @@ class GSplatOctreeInstance {
         // Sync splat budget from placement and detect changes
         const currentBudget = this.placement.splatBudget;
         if (currentBudget !== this.splatBudget) {
+            console.log(`💰 splatBudget changed: ${this.splatBudget} -> ${currentBudget} (from placement)`);
             this.splatBudget = currentBudget;
             this.needsLodUpdate = true;
         }

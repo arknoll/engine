@@ -423,9 +423,13 @@ class GSplatComponent extends Component {
      * @type {number}
      */
     set splatBudget(value) {
+        console.log(`🎮 GSplatComponent.splatBudget SET: ${this._splatBudget} -> ${value}, entity: ${this.entity?.name}`);
         this._splatBudget = value;
         if (this._placement) {
             this._placement.splatBudget = this._splatBudget;
+            console.log(`   → Applied to placement`);
+        } else {
+            console.log(`   ⚠️ No placement yet, budget will be applied when placement is created`);
         }
     }
 
