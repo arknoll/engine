@@ -665,6 +665,16 @@ class ForwardRenderer extends Renderer {
 				this.collectLights(comp);
 				this.beginFrame(comp);
 				this.setSceneConstants();
+				if (this.gsplatDirector && comp.cameras.length > 0) {
+						const cam = comp.cameras[0];
+						if (cam?.camera?.node) {
+								const lp = cam.camera.node.localPosition;
+								if (!this._lastCamLog || Date.now() - this._lastCamLog > 1000) {
+										this._lastCamLog = Date.now();
+										console.log(`🎬 ForwardRenderer BEFORE gsplat: Vec3ID=${lp._dbgId || 'NONE'} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
+								}
+						}
+				}
 				this.gsplatDirector?.update(comp);
 				this.cullComposition(comp);
 				this.gpuUpdate(this.processingMeshInstances);

@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 35f1b25ca (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision cd46b1522 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = '35f1b25ca';
+	var revision = 'cd46b1522';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -30741,6 +30741,17 @@
 					this.collectLights(comp);
 					this.beginFrame(comp);
 					this.setSceneConstants();
+					if (this.gsplatDirector && comp.cameras.length > 0) {
+							var _cam_camera;
+							var cam = comp.cameras[0];
+							if (cam == null ? void 0 : (_cam_camera = cam.camera) == null ? void 0 : _cam_camera.node) {
+									var lp = cam.camera.node.localPosition;
+									if (!this._lastCamLog || Date.now() - this._lastCamLog > 1000) {
+											this._lastCamLog = Date.now();
+											console.log("\uD83C\uDFAC ForwardRenderer BEFORE gsplat: Vec3ID=" + (lp._dbgId || 'NONE') + " pos=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ")");
+									}
+							}
+					}
 					(_this_gsplatDirector = this.gsplatDirector) == null ? void 0 : _this_gsplatDirector.update(comp);
 					this.cullComposition(comp);
 					this.gpuUpdate(this.processingMeshInstances);

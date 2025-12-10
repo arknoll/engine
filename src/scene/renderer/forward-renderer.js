@@ -1017,6 +1017,17 @@ class ForwardRenderer extends Renderer {
         this.setSceneConstants();
 
         // update gsplat director
+        // DEBUG: Log camera localPosition right before gsplatDirector update
+        if (this.gsplatDirector && comp.cameras.length > 0) {
+            const cam = comp.cameras[0];
+            if (cam?.camera?.node) {
+                const lp = cam.camera.node.localPosition;
+                if (!this._lastCamLog || Date.now() - this._lastCamLog > 1000) {
+                    this._lastCamLog = Date.now();
+                    console.log(`🎬 ForwardRenderer BEFORE gsplat: Vec3ID=${lp._dbgId || 'NONE'} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
+                }
+            }
+        }
         this.gsplatDirector?.update(comp);
 
         // visibility culling of lights, meshInstances, shadows casters

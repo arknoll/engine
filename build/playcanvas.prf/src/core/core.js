@@ -1,5 +1,5 @@
 const version = '2.15.0-beta.0';
-const revision = '35f1b25ca';
+const revision = 'cd46b1522';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];

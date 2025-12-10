@@ -44720,6 +44720,7 @@ declare class ForwardRenderer extends Renderer {
      * @param {LayerComposition} comp - The layer composition.
      */
     update(comp: LayerComposition): void;
+    _lastCamLog: number;
 }
 
 /**
