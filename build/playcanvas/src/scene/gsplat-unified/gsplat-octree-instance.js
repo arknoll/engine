@@ -298,6 +298,7 @@ class GSplatOctreeInstance {
 												const currentLod = node.lods[currentOptimalLod];
 												const nextLod = node.lods[currentOptimalLod + 1];
 												const splatsSaved = currentLod.count - nextLod.count;
+												console.log(`🔢 Degrading node from LOD ${currentOptimalLod} to ${currentOptimalLod + 1}: ${splatsSaved} splats saved`);
 												nodeInfo.optimalLod += lodDelta;
 												currentSplats -= splatsSaved;
 												modified = true;
