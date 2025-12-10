@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision cd46b1522 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision a0f21eec8 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = 'cd46b1522';
+	var revision = 'a0f21eec8';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -30745,10 +30745,13 @@
 							var _cam_camera;
 							var cam = comp.cameras[0];
 							if (cam == null ? void 0 : (_cam_camera = cam.camera) == null ? void 0 : _cam_camera.node) {
-									var lp = cam.camera.node.localPosition;
+									var node = cam.camera.node;
+									var lp = node.localPosition;
 									if (!this._lastCamLog || Date.now() - this._lastCamLog > 1000) {
+											var _node_parent, _node__guid;
 											this._lastCamLog = Date.now();
-											console.log("\uD83C\uDFAC ForwardRenderer BEFORE gsplat: Vec3ID=" + (lp._dbgId || 'NONE') + " pos=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ")");
+											var parentName = ((_node_parent = node.parent) == null ? void 0 : _node_parent.name) || 'null';
+											console.log("\uD83C\uDFAC FwdRender: node=" + ((_node__guid = node._guid) == null ? void 0 : _node__guid.slice(0, 8)) + " parent=" + parentName + " Vec3ID=" + (lp._dbgId || 'NONE') + " pos=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ")");
 									}
 							}
 					}
@@ -94606,9 +94609,11 @@
 					var node = this._camera.camera._node;
 					if (!node.localPosition._dbgId) node.localPosition._dbgId = 'XR_' + Date.now();
 					if (!this._lastXrPosLog || Date.now() - this._lastXrPosLog > 1000) {
+							var _node_parent, _node__guid;
 							this._lastXrPosLog = Date.now();
 							var lp = node.localPosition;
-							console.log("\uD83C\uDFAF XR: Vec3ID=" + lp._dbgId + " pos=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ")");
+							var parentName = ((_node_parent = node.parent) == null ? void 0 : _node_parent.name) || 'null';
+							console.log("\uD83C\uDFAF XR: node=" + ((_node__guid = node._guid) == null ? void 0 : _node__guid.slice(0, 8)) + " parent=" + parentName + " pos=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ")");
 					}
 					this.input.update(frame);
 					if (this._type === XRTYPE_AR) {

@@ -381,7 +381,8 @@ class XrManager extends EventHandler {
 				if (!this._lastXrPosLog || Date.now() - this._lastXrPosLog > 1000) {
 						this._lastXrPosLog = Date.now();
 						const lp = node.localPosition;
-						console.log(`🎯 XR: Vec3ID=${lp._dbgId} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
+						const parentName = node.parent?.name || 'null';
+						console.log(`🎯 XR: node=${node._guid?.slice(0, 8)} parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
 				}
 				this.input.update(frame);
 				if (this._type === XRTYPE_AR) {

@@ -1021,10 +1021,12 @@ class ForwardRenderer extends Renderer {
         if (this.gsplatDirector && comp.cameras.length > 0) {
             const cam = comp.cameras[0];
             if (cam?.camera?.node) {
-                const lp = cam.camera.node.localPosition;
+                const node = cam.camera.node;
+                const lp = node.localPosition;
                 if (!this._lastCamLog || Date.now() - this._lastCamLog > 1000) {
                     this._lastCamLog = Date.now();
-                    console.log(`🎬 ForwardRenderer BEFORE gsplat: Vec3ID=${lp._dbgId || 'NONE'} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
+                    const parentName = node.parent?.name || 'null';
+                    console.log(`🎬 FwdRender: node=${node._guid?.slice(0,8)} parent=${parentName} Vec3ID=${lp._dbgId || 'NONE'} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
                 }
             }
         }
