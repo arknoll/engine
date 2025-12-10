@@ -397,7 +397,9 @@ class GSplatManager {
 								inst.updateMoved();
 						}
 						this.lastLodCameraPos.copy(this.cameraNode.getPosition());
+						console.log('lastLodCameraPos', this.lastLodCameraPos);
 						this.lastLodCameraFwd.copy(this.cameraNode.forward);
+						console.log('lastLodCameraFwd', this.lastLodCameraFwd);
 						for (const [, inst] of this.octreeInstances){
 								inst.updateLod(this.cameraNode, this.scene.gsplat);
 						}

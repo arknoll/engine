@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 13eb2af2d (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 2f5a69cc8 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = '13eb2af2d';
+	var revision = '2f5a69cc8';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -78965,7 +78965,9 @@
 									inst2.updateMoved();
 							}
 							this.lastLodCameraPos.copy(this.cameraNode.getPosition());
+							console.log('lastLodCameraPos', this.lastLodCameraPos);
 							this.lastLodCameraFwd.copy(this.cameraNode.forward);
+							console.log('lastLodCameraFwd', this.lastLodCameraFwd);
 							for(var _iterator3 = _create_for_of_iterator_helper_loose$j(this.octreeInstances), _step3; !(_step3 = _iterator3()).done;){
 									var _step_value3 = _step3.value, inst3 = _step_value3[1];
 									inst3.updateLod(this.cameraNode, this.scene.gsplat);

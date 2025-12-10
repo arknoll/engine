@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 13eb2af2d (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 2f5a69cc8 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = '13eb2af2d';
+const revision = '2f5a69cc8';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -79263,7 +79263,9 @@ class GSplatManager {
 								inst.updateMoved();
 						}
 						this.lastLodCameraPos.copy(this.cameraNode.getPosition());
+						console.log('lastLodCameraPos', this.lastLodCameraPos);
 						this.lastLodCameraFwd.copy(this.cameraNode.forward);
+						console.log('lastLodCameraFwd', this.lastLodCameraFwd);
 						for (const [, inst] of this.octreeInstances){
 								inst.updateLod(this.cameraNode, this.scene.gsplat);
 						}

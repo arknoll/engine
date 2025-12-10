@@ -665,7 +665,9 @@ class GSplatManager {
 
             // update last camera data when LOD was evaluated
             this.lastLodCameraPos.copy(this.cameraNode.getPosition());
+            console.log('lastLodCameraPos', this.lastLodCameraPos);
             this.lastLodCameraFwd.copy(this.cameraNode.forward);
+            console.log('lastLodCameraFwd', this.lastLodCameraFwd);
 
             // update LOD for all octree instances
             for (const [, inst] of this.octreeInstances) {
