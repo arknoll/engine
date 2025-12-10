@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision d5b7d9c25 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 13eb2af2d (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = 'd5b7d9c25';
+	var revision = '13eb2af2d';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -78841,6 +78841,7 @@
 					}
 					var cameraRotated = false;
 					var lodUpdateAngleDeg = this.scene.gsplat.lodUpdateAngle;
+					console.log('lodUpdateAngleDeg', lodUpdateAngleDeg);
 					if (lodUpdateAngleDeg > 0) {
 							if (Number.isFinite(this.lastLodCameraFwd.x)) {
 									var currentCameraFwd = this.cameraNode.forward;
@@ -78848,6 +78849,7 @@
 									var angle = Math.acos(dot);
 									var rotThreshold = lodUpdateAngleDeg * math.DEG_TO_RAD;
 									cameraRotated = angle > rotThreshold;
+									console.log('cameraRotated', cameraRotated);
 							} else {
 									cameraRotated = true;
 							}
