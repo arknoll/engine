@@ -372,12 +372,29 @@ class GSplatOctreeInstance {
         const rangeMax = Math.max(rangeMin, Math.min(lodRangeMax ?? maxLod, maxLod));
         // Pass 1: Evaluate optimal LOD for each node (distance-based)
         const totalOptimalSplats = this.evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params);
+        // Debug: Log LOD distribution (throttled)
+        const shouldLog = !this._lastLodLogTime || Date.now() - this._lastLodLogTime > 2000;
+        if (shouldLog) {
+            this._lastLodLogTime = Date.now();
+            // Before budget
+            const beforeCounts = {};
+            let beforeSplats = 0;
+            const nodes = this.octree.nodes;
+            for(let i = 0; i < this.nodeInfos.length; i++){
+                const lod = this.nodeInfos[i].optimalLod;
+                if (lod >= 0) {
+                    beforeCounts[lod] = (beforeCounts[lod] || 0) + 1;
+                    const lodData = nodes[i].lods[lod];
+                    if (lodData) beforeSplats += lodData.count;
+                }
+            }
+            console.log(`📊 BEFORE: ${JSON.stringify(beforeCounts)} splats=${beforeSplats} range=[${rangeMin},${rangeMax}] lodDist=[${lodDistances.slice(0, 5).join(',')}...] maxLod=${maxLod}`);
+        }
         // Enforce splat budget if enabled (bidirectional: degrade or upgrade)
         if (this.splatBudget > 0) {
             this.enforceSplatBudget(totalOptimalSplats, this.splatBudget, rangeMin, rangeMax);
-            // Debug: Log LOD distribution after budget enforcement (throttled)
-            if (!this._lastLodLogTime || Date.now() - this._lastLodLogTime > 2000) {
-                this._lastLodLogTime = Date.now();
+            // Debug: Log LOD distribution after budget enforcement
+            if (shouldLog) {
                 const lodCounts = {};
                 let culledCount = 0;
                 let totalSplats = 0;
@@ -392,7 +409,7 @@ class GSplatOctreeInstance {
                         if (lodData) totalSplats += lodData.count;
                     }
                 }
-                console.log(`🎨 LOD after budget: ${JSON.stringify(lodCounts)} culled=${culledCount} splats=${totalSplats}/${this.splatBudget}`);
+                console.log(`🎨 AFTER: ${JSON.stringify(lodCounts)} culled=${culledCount} splats=${totalSplats}/${this.splatBudget}`);
             }
         }
         // Pass 2: Calculate desired LOD (underfill) and apply changes

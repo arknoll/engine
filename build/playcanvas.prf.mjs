@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision a29416bc4 (PROFILE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 61b31d871 (PROFILE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = 'a29416bc4';
+const revision = '61b31d871';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -78460,10 +78460,25 @@ class GSplatOctreeInstance {
 				const rangeMin = Math.max(0, Math.min(lodRangeMin ?? 0, maxLod));
 				const rangeMax = Math.max(rangeMin, Math.min(lodRangeMax ?? maxLod, maxLod));
 				const totalOptimalSplats = this.evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params);
+				const shouldLog = !this._lastLodLogTime || Date.now() - this._lastLodLogTime > 2000;
+				if (shouldLog) {
+						this._lastLodLogTime = Date.now();
+						const beforeCounts = {};
+						let beforeSplats = 0;
+						const nodes = this.octree.nodes;
+						for(let i = 0; i < this.nodeInfos.length; i++){
+								const lod = this.nodeInfos[i].optimalLod;
+								if (lod >= 0) {
+										beforeCounts[lod] = (beforeCounts[lod] || 0) + 1;
+										const lodData = nodes[i].lods[lod];
+										if (lodData) beforeSplats += lodData.count;
+								}
+						}
+						console.log(`📊 BEFORE: ${JSON.stringify(beforeCounts)} splats=${beforeSplats} range=[${rangeMin},${rangeMax}] lodDist=[${lodDistances.slice(0, 5).join(',')}...] maxLod=${maxLod}`);
+				}
 				if (this.splatBudget > 0) {
 						this.enforceSplatBudget(totalOptimalSplats, this.splatBudget, rangeMin, rangeMax);
-						if (!this._lastLodLogTime || Date.now() - this._lastLodLogTime > 2000) {
-								this._lastLodLogTime = Date.now();
+						if (shouldLog) {
 								const lodCounts = {};
 								let culledCount = 0;
 								let totalSplats = 0;
@@ -78478,7 +78493,7 @@ class GSplatOctreeInstance {
 												if (lodData) totalSplats += lodData.count;
 										}
 								}
-								console.log(`🎨 LOD after budget: ${JSON.stringify(lodCounts)} culled=${culledCount} splats=${totalSplats}/${this.splatBudget}`);
+								console.log(`🎨 AFTER: ${JSON.stringify(lodCounts)} culled=${culledCount} splats=${totalSplats}/${this.splatBudget}`);
 						}
 				}
 				this.applyLodChanges(maxLod, params);

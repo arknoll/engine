@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision a29416bc4 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 61b31d871 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = 'a29416bc4';
+	var revision = '61b31d871';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -77810,25 +77810,40 @@
 					var rangeMin = Math.max(0, Math.min(lodRangeMin != null ? lodRangeMin : 0, maxLod));
 					var rangeMax = Math.max(rangeMin, Math.min(lodRangeMax != null ? lodRangeMax : maxLod, maxLod));
 					var totalOptimalSplats = this.evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params);
+					var shouldLog = !this._lastLodLogTime || Date.now() - this._lastLodLogTime > 2000;
+					if (shouldLog) {
+							this._lastLodLogTime = Date.now();
+							var beforeCounts = {};
+							var beforeSplats = 0;
+							var nodes = this.octree.nodes;
+							for(var i = 0; i < this.nodeInfos.length; i++){
+									var lod = this.nodeInfos[i].optimalLod;
+									if (lod >= 0) {
+											beforeCounts[lod] = (beforeCounts[lod] || 0) + 1;
+											var lodData = nodes[i].lods[lod];
+											if (lodData) beforeSplats += lodData.count;
+									}
+							}
+							console.log("\uD83D\uDCCA BEFORE: " + JSON.stringify(beforeCounts) + " splats=" + beforeSplats + " range=[" + rangeMin + "," + rangeMax + "] lodDist=[" + lodDistances.slice(0, 5).join(',') + "...] maxLod=" + maxLod);
+					}
 					if (this.splatBudget > 0) {
 							this.enforceSplatBudget(totalOptimalSplats, this.splatBudget, rangeMin, rangeMax);
-							if (!this._lastLodLogTime || Date.now() - this._lastLodLogTime > 2000) {
-									this._lastLodLogTime = Date.now();
+							if (shouldLog) {
 									var lodCounts = {};
 									var culledCount = 0;
 									var totalSplats = 0;
-									var nodes = this.octree.nodes;
-									for(var i = 0; i < this.nodeInfos.length; i++){
-											var lod = this.nodeInfos[i].optimalLod;
-											if (lod < 0) {
+									var nodes1 = this.octree.nodes;
+									for(var i1 = 0; i1 < this.nodeInfos.length; i1++){
+											var lod1 = this.nodeInfos[i1].optimalLod;
+											if (lod1 < 0) {
 													culledCount++;
 											} else {
-													lodCounts[lod] = (lodCounts[lod] || 0) + 1;
-													var lodData = nodes[i].lods[lod];
-													if (lodData) totalSplats += lodData.count;
+													lodCounts[lod1] = (lodCounts[lod1] || 0) + 1;
+													var lodData1 = nodes1[i1].lods[lod1];
+													if (lodData1) totalSplats += lodData1.count;
 											}
 									}
-									console.log("\uD83C\uDFA8 LOD after budget: " + JSON.stringify(lodCounts) + " culled=" + culledCount + " splats=" + totalSplats + "/" + this.splatBudget);
+									console.log("\uD83C\uDFA8 AFTER: " + JSON.stringify(lodCounts) + " culled=" + culledCount + " splats=" + totalSplats + "/" + this.splatBudget);
 							}
 					}
 					this.applyLodChanges(maxLod, params);
