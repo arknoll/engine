@@ -1017,16 +1017,17 @@ class ForwardRenderer extends Renderer {
         this.setSceneConstants();
 
         // update gsplat director
-        // DEBUG: Log camera localPosition right before gsplatDirector update
-        if (this.gsplatDirector && comp.cameras.length > 0) {
-            const cam = comp.cameras[0];
-            if (cam?.camera?.node) {
-                const node = cam.camera.node;
-                const lp = node.localPosition;
-                if (!this._lastCamLog || Date.now() - this._lastCamLog > 1000) {
-                    this._lastCamLog = Date.now();
+        // DEBUG: Log ALL cameras in composition
+        if (this.gsplatDirector && (!this._lastCamLog || Date.now() - this._lastCamLog > 1000)) {
+            this._lastCamLog = Date.now();
+            console.log(`🎬 FwdRender: ${comp.cameras.length} camera(s)`);
+            for (let i = 0; i < comp.cameras.length; i++) {
+                const cam = comp.cameras[i];
+                if (cam?.camera?.node) {
+                    const node = cam.camera.node;
+                    const lp = node.localPosition;
                     const parentName = node.parent?.name || 'null';
-                    console.log(`🎬 FwdRender: node=${node._guid?.slice(0,8)} parent=${parentName} Vec3ID=${lp._dbgId || 'NONE'} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
+                    console.log(`   [${i}] ${node.name}: parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
                 }
             }
         }
