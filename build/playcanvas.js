@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 32c995bfc (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision a29416bc4 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = '32c995bfc';
+	var revision = 'a29416bc4';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -77812,6 +77812,24 @@
 					var totalOptimalSplats = this.evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params);
 					if (this.splatBudget > 0) {
 							this.enforceSplatBudget(totalOptimalSplats, this.splatBudget, rangeMin, rangeMax);
+							if (!this._lastLodLogTime || Date.now() - this._lastLodLogTime > 2000) {
+									this._lastLodLogTime = Date.now();
+									var lodCounts = {};
+									var culledCount = 0;
+									var totalSplats = 0;
+									var nodes = this.octree.nodes;
+									for(var i = 0; i < this.nodeInfos.length; i++){
+											var lod = this.nodeInfos[i].optimalLod;
+											if (lod < 0) {
+													culledCount++;
+											} else {
+													lodCounts[lod] = (lodCounts[lod] || 0) + 1;
+													var lodData = nodes[i].lods[lod];
+													if (lodData) totalSplats += lodData.count;
+											}
+									}
+									console.log("\uD83C\uDFA8 LOD after budget: " + JSON.stringify(lodCounts) + " culled=" + culledCount + " splats=" + totalSplats + "/" + this.splatBudget);
+							}
 					}
 					this.applyLodChanges(maxLod, params);
 			};

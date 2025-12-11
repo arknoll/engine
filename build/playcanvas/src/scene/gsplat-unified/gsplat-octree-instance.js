@@ -217,6 +217,24 @@ class GSplatOctreeInstance {
 				const totalOptimalSplats = this.evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params);
 				if (this.splatBudget > 0) {
 						this.enforceSplatBudget(totalOptimalSplats, this.splatBudget, rangeMin, rangeMax);
+						if (!this._lastLodLogTime || Date.now() - this._lastLodLogTime > 2000) {
+								this._lastLodLogTime = Date.now();
+								const lodCounts = {};
+								let culledCount = 0;
+								let totalSplats = 0;
+								const nodes = this.octree.nodes;
+								for(let i = 0; i < this.nodeInfos.length; i++){
+										const lod = this.nodeInfos[i].optimalLod;
+										if (lod < 0) {
+												culledCount++;
+										} else {
+												lodCounts[lod] = (lodCounts[lod] || 0) + 1;
+												const lodData = nodes[i].lods[lod];
+												if (lodData) totalSplats += lodData.count;
+										}
+								}
+								console.log(`🎨 LOD after budget: ${JSON.stringify(lodCounts)} culled=${culledCount} splats=${totalSplats}/${this.splatBudget}`);
+						}
 				}
 				this.applyLodChanges(maxLod, params);
 		}

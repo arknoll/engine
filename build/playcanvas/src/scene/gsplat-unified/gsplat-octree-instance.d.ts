@@ -160,6 +160,7 @@ export class GSplatOctreeInstance {
      * @param {import('./gsplat-params.js').GSplatParams} params - Global gsplat parameters.
      */
     updateLod(cameraNode: GraphNode, params: import("./gsplat-params.js").GSplatParams): void;
+    _lastLodLogTime: number;
     /**
      * Evaluates optimal LOD indices for all nodes based on camera position and parameters.
      * This is Pass 1 of the LOD update process. Results are stored in nodeInfos array.
