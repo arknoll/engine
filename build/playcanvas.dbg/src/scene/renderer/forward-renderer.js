@@ -793,7 +793,7 @@ function vogelSpherePrecalculationSamples(numSamples) {
         this.beginFrame(comp);
         this.setSceneConstants();
         // update gsplat director
-        // DEBUG: Log ALL cameras in composition
+        // DEBUG: Log ALL cameras in composition with GUID
         if (this.gsplatDirector && (!this._lastCamLog || Date.now() - this._lastCamLog > 1000)) {
             this._lastCamLog = Date.now();
             console.log(`🎬 FwdRender: ${comp.cameras.length} camera(s)`);
@@ -803,7 +803,8 @@ function vogelSpherePrecalculationSamples(numSamples) {
                     const node = cam.camera.node;
                     const lp = node.localPosition;
                     const parentName = node.parent?.name || 'null';
-                    console.log(`   [${i}] ${node.name}: parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
+                    const guid = node._guid?.slice(0, 8) || 'NO_GUID';
+                    console.log(`   [${i}] ${node.name} (${guid}): parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
                 }
             }
         }

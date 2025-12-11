@@ -981,6 +981,11 @@ const up = new Vec3();
         } else {
             position.set(x, y, z);
         }
+        // DEBUG: Log any setPosition calls on camera nodes
+        if (this.name === 'Camera' || this.parent?.name === 'VRCameraParent') {
+            console.log(`📌 setPosition on ${this.name}: world=(${position.x.toFixed(3)}, ${position.y.toFixed(3)}, ${position.z.toFixed(3)})`);
+            console.trace();
+        }
         if (this._parent === null) {
             this.localPosition.copy(position);
         } else {

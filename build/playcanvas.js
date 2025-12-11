@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 6afeb68a9 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 675d8ac96 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = '6afeb68a9';
+	var revision = '675d8ac96';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -26109,10 +26109,15 @@
 					this._aabbVer++;
 			};
 			_proto.setPosition = function setPosition(x, y, z) {
+					var _this_parent;
 					if (_instanceof$12(x, Vec3)) {
 							position$3.copy(x);
 					} else {
 							position$3.set(x, y, z);
+					}
+					if (this.name === 'Camera' || ((_this_parent = this.parent) == null ? void 0 : _this_parent.name) === 'VRCameraParent') {
+							console.log("\uD83D\uDCCC setPosition on " + this.name + ": world=(" + position$3.x.toFixed(3) + ", " + position$3.y.toFixed(3) + ", " + position$3.z.toFixed(3) + ")");
+							console.trace();
 					}
 					if (this._parent === null) {
 							this.localPosition.copy(position$3);
@@ -30754,11 +30759,12 @@
 									var _cam_camera;
 									var cam = comp.cameras[i];
 									if (cam == null ? void 0 : (_cam_camera = cam.camera) == null ? void 0 : _cam_camera.node) {
-											var _node_parent;
+											var _node_parent, _node__guid;
 											var node = cam.camera.node;
 											var lp = node.localPosition;
 											var parentName = ((_node_parent = node.parent) == null ? void 0 : _node_parent.name) || 'null';
-											console.log("   [" + i + "] " + node.name + ": parent=" + parentName + " pos=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ")");
+											var guid = ((_node__guid = node._guid) == null ? void 0 : _node__guid.slice(0, 8)) || 'NO_GUID';
+											console.log("   [" + i + "] " + node.name + " (" + guid + "): parent=" + parentName + " pos=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ")");
 									}
 							}
 					}

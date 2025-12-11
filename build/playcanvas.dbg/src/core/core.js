@@ -4,7 +4,7 @@
 /**
  * The engine revision number. This is the Git hash of the last commit made to the branch
  * from which the engine was built.
- */ const revision = '6afeb68a9';
+ */ const revision = '675d8ac96';
 /**
  * Merge the contents of two objects into a single object.
  *

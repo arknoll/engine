@@ -648,7 +648,8 @@ class ForwardRenderer extends Renderer {
 										const node = cam.camera.node;
 										const lp = node.localPosition;
 										const parentName = node.parent?.name || 'null';
-										console.log(`   [${i}] ${node.name}: parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
+										const guid = node._guid?.slice(0, 8) || 'NO_GUID';
+										console.log(`   [${i}] ${node.name} (${guid}): parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
 								}
 						}
 				}

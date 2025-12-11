@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 6afeb68a9 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 675d8ac96 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = '6afeb68a9';
+const revision = '675d8ac96';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -22408,6 +22408,10 @@ class GraphNode extends EventHandler {
 				} else {
 						position$3.set(x, y, z);
 				}
+				if (this.name === 'Camera' || this.parent?.name === 'VRCameraParent') {
+						console.log(`📌 setPosition on ${this.name}: world=(${position$3.x.toFixed(3)}, ${position$3.y.toFixed(3)}, ${position$3.z.toFixed(3)})`);
+						console.trace();
+				}
 				if (this._parent === null) {
 						this.localPosition.copy(position$3);
 				} else {
@@ -26426,7 +26430,8 @@ class ForwardRenderer extends Renderer {
 										const node = cam.camera.node;
 										const lp = node.localPosition;
 										const parentName = node.parent?.name || 'null';
-										console.log(`   [${i}] ${node.name}: parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
+										const guid = node._guid?.slice(0, 8) || 'NO_GUID';
+										console.log(`   [${i}] ${node.name} (${guid}): parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
 								}
 						}
 				}
