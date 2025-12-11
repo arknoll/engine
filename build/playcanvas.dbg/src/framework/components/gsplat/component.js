@@ -115,6 +115,9 @@ import { GSplatPlacement } from '../../../scene/gsplat-unified/gsplat-placement.
      * @type {number}
      * @private
      */ this._splatBudget = 0, /**
+     * @type {number}
+     * @private
+     */ this._cullDistance = 0, /**
      * @type {BoundingBox|null}
      * @private
      */ this._customAabb = null, /**
@@ -359,6 +362,27 @@ import { GSplatPlacement } from '../../../scene/gsplat-unified/gsplat-placement.
         return this._splatBudget;
     }
     /**
+     * Sets the maximum distance from the camera at which splats will be rendered.
+     * Splats beyond this distance are completely culled (not rendered).
+     * Set to 0 to disable distance culling (default).
+     *
+     * Only applies to octree-based gsplat rendering in unified mode.
+     *
+     * @type {number}
+     */ set cullDistance(value) {
+        this._cullDistance = value;
+        if (this._placement) {
+            this._placement.cullDistance = this._cullDistance;
+        }
+    }
+    /**
+     * Gets the cull distance for this component.
+     *
+     * @type {number}
+     */ get cullDistance() {
+        return this._cullDistance;
+    }
+    /**
      * Sets whether to use the unified gsplat rendering. Can be changed only when the component is
      * not enabled. Default is false.
      *
@@ -587,6 +611,7 @@ import { GSplatPlacement } from '../../../scene/gsplat-unified/gsplat-placement.
                 this._placement = new GSplatPlacement(asset.resource, this.entity);
                 this._placement.lodDistances = this._lodDistances;
                 this._placement.splatBudget = this._splatBudget;
+                this._placement.cullDistance = this._cullDistance;
                 // add placement to layers if component is enabled
                 if (this.enabled && this.entity.enabled) {
                     this.addToLayers();

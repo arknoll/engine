@@ -41,6 +41,12 @@ import { Debug } from '../../core/debug.js';
      * @type {number}
      */ this.splatBudget = 0;
         /**
+     * Maximum distance from camera at which splats will be rendered. Splats beyond this
+     * distance are completely culled (not rendered). Set to 0 to disable (default).
+     *
+     * @type {number}
+     */ this.cullDistance = 0;
+        /**
      * The axis-aligned bounding box for this placement, in local space.
      *
      * @type {BoundingBox}

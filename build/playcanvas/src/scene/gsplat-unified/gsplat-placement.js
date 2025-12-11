@@ -6,6 +6,7 @@ class GSplatPlacement {
 				this.lodIndex = 0;
 				this._lodDistances = null;
 				this.splatBudget = 0;
+				this.cullDistance = 0;
 				this._aabb = new BoundingBox();
 				this.resource = resource;
 				this.node = node;

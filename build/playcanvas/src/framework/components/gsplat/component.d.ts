@@ -108,6 +108,11 @@ export class GSplatComponent extends Component {
      */
     private _splatBudget;
     /**
+     * @type {number}
+     * @private
+     */
+    private _cullDistance;
+    /**
      * @type {BoundingBox|null}
      * @private
      */
@@ -256,6 +261,22 @@ export class GSplatComponent extends Component {
      * @type {number}
      */
     get splatBudget(): number;
+    /**
+     * Sets the maximum distance from the camera at which splats will be rendered.
+     * Splats beyond this distance are completely culled (not rendered).
+     * Set to 0 to disable distance culling (default).
+     *
+     * Only applies to octree-based gsplat rendering in unified mode.
+     *
+     * @type {number}
+     */
+    set cullDistance(value: number);
+    /**
+     * Gets the cull distance for this component.
+     *
+     * @type {number}
+     */
+    get cullDistance(): number;
     /**
      * Sets whether to use the unified gsplat rendering. Can be changed only when the component is
      * not enabled. Default is false.

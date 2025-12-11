@@ -385,6 +385,11 @@ class GSplatOctreeInstance {
      * @returns {number} Desired LOD index to display.
      */
     selectDesiredLodIndex(node, optimalLodIndex, maxLod, lodUnderfillLimit) {
+        // Handle culled nodes (optimalLodIndex < 0 means node is culled)
+        if (optimalLodIndex < 0) {
+            return -1;
+        }
+
         if (lodUnderfillLimit > 0) {
             const allowedMaxCoarseLod = Math.min(maxLod, optimalLodIndex + lodUnderfillLimit);
 
@@ -616,13 +621,27 @@ class GSplatOctreeInstance {
                     const node = nodes[nodeIndex];
                     const currentOptimalLod = nodeInfo.optimalLod;
 
-                    // Try degrading to next coarser LOD (respect rangeMax constraint)
+                    // Skip already culled nodes
+                    if (currentOptimalLod < 0) continue;
+
+                    // Try degrading to next coarser LOD
                     if (currentOptimalLod < rangeMax) {
                         const currentLod = node.lods[currentOptimalLod];
                         const nextLod = node.lods[currentOptimalLod + 1];
                         const splatsSaved = currentLod.count - nextLod.count;
                         // Degrade to coarser LOD
                         nodeInfo.optimalLod += lodDelta;
+                        currentSplats -= splatsSaved;
+                        modified = true;
+
+                        if (currentSplats <= splatBudget) {
+                            break; // Within budget
+                        }
+                    } else {
+                        // Already at max LOD - cull entirely to save more budget
+                        const currentLod = node.lods[currentOptimalLod];
+                        const splatsSaved = currentLod.count;
+                        nodeInfo.optimalLod = -1; // Mark as culled
                         currentSplats -= splatsSaved;
                         modified = true;
 
@@ -639,6 +658,23 @@ class GSplatOctreeInstance {
                     const nodeInfo = nodeInfos[nodeIndex];
                     const node = nodes[nodeIndex];
                     const currentOptimalLod = nodeInfo.optimalLod;
+
+                    // Restore culled nodes first (bring back at max LOD)
+                    if (currentOptimalLod < 0) {
+                        const maxLodData = node.lods[rangeMax];
+                        const splatsAdded = maxLodData.count;
+
+                        if (currentSplats + splatsAdded <= splatBudget) {
+                            nodeInfo.optimalLod = rangeMax;
+                            currentSplats += splatsAdded;
+                            modified = true;
+
+                            if (currentSplats >= splatBudget) {
+                                break;
+                            }
+                        }
+                        continue;
+                    }
 
                     // Try upgrading to next finer LOD (respect rangeMin constraint)
                     if (currentOptimalLod > rangeMin) {

@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision b1d2f5972 (PROFILE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 32c995bfc (PROFILE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = 'b1d2f5972';
+	var revision = '32c995bfc';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -77682,6 +77682,7 @@
 					this.lodIndex = 0;
 					this._lodDistances = null;
 					this.splatBudget = 0;
+					this.cullDistance = 0;
 					this._aabb = new BoundingBox();
 					this.resource = resource;
 					this.node = node;
@@ -77913,6 +77914,9 @@
 					return maxLod;
 			};
 			_proto.selectDesiredLodIndex = function selectDesiredLodIndex(node, optimalLodIndex, maxLod, lodUnderfillLimit) {
+					if (optimalLodIndex < 0) {
+							return -1;
+					}
 					if (lodUnderfillLimit > 0) {
 							var allowedMaxCoarseLod = Math.min(maxLod, optimalLodIndex + lodUnderfillLimit);
 							for(var lod = optimalLodIndex; lod <= allowedMaxCoarseLod; lod++){
@@ -78054,12 +78058,22 @@
 											var nodeInfo = nodeInfos[nodeIndex];
 											var node = nodes[nodeIndex];
 											var currentOptimalLod = nodeInfo.optimalLod;
+											if (currentOptimalLod < 0) continue;
 											if (currentOptimalLod < rangeMax) {
 													var currentLod = node.lods[currentOptimalLod];
 													var nextLod = node.lods[currentOptimalLod + 1];
 													var splatsSaved = currentLod.count - nextLod.count;
 													nodeInfo.optimalLod += lodDelta;
 													currentSplats -= splatsSaved;
+													modified = true;
+													if (currentSplats <= splatBudget) {
+															break;
+													}
+											} else {
+													var currentLod1 = node.lods[currentOptimalLod];
+													var splatsSaved1 = currentLod1.count;
+													nodeInfo.optimalLod = -1;
+													currentSplats -= splatsSaved1;
 													modified = true;
 													if (currentSplats <= splatBudget) {
 															break;
@@ -78072,13 +78086,26 @@
 											var nodeInfo1 = nodeInfos[nodeIndex1];
 											var node1 = nodes[nodeIndex1];
 											var currentOptimalLod1 = nodeInfo1.optimalLod;
-											if (currentOptimalLod1 > rangeMin) {
-													var currentLod1 = node1.lods[currentOptimalLod1];
-													var nextLod1 = node1.lods[currentOptimalLod1 - 1];
-													var splatsAdded = nextLod1.count - currentLod1.count;
+											if (currentOptimalLod1 < 0) {
+													var maxLodData = node1.lods[rangeMax];
+													var splatsAdded = maxLodData.count;
 													if (currentSplats + splatsAdded <= splatBudget) {
-															nodeInfo1.optimalLod += lodDelta;
+															nodeInfo1.optimalLod = rangeMax;
 															currentSplats += splatsAdded;
+															modified = true;
+															if (currentSplats >= splatBudget) {
+																	break;
+															}
+													}
+													continue;
+											}
+											if (currentOptimalLod1 > rangeMin) {
+													var currentLod2 = node1.lods[currentOptimalLod1];
+													var nextLod1 = node1.lods[currentOptimalLod1 - 1];
+													var splatsAdded1 = nextLod1.count - currentLod2.count;
+													if (currentSplats + splatsAdded1 <= splatBudget) {
+															nodeInfo1.optimalLod += lodDelta;
+															currentSplats += splatsAdded1;
 															modified = true;
 															if (currentSplats >= splatBudget) {
 																	break;
@@ -79588,7 +79615,7 @@
 							50,
 							55,
 							60
-					], _this._splatBudget = 0, _this._customAabb = null, _this._evtLayersChanged = null, _this._evtLayerAdded = null, _this._evtLayerRemoved = null, _this._castShadows = false, _this._unified = false;
+					], _this._splatBudget = 0, _this._cullDistance = 0, _this._customAabb = null, _this._evtLayersChanged = null, _this._evtLayerAdded = null, _this._evtLayerRemoved = null, _this._castShadows = false, _this._unified = false;
 					_this._assetReference = new AssetReference('asset', _this, system.app.assets, {
 							add: _this._onGSplatAssetAdded,
 							load: _this._onGSplatAssetLoad,
@@ -79760,6 +79787,7 @@
 									this._placement = new GSplatPlacement(asset.resource, this.entity);
 									this._placement.lodDistances = this._lodDistances;
 									this._placement.splatBudget = this._splatBudget;
+									this._placement.cullDistance = this._cullDistance;
 									if (this.enabled && this.entity.enabled) {
 											this.addToLayers();
 									}
@@ -79921,6 +79949,18 @@
 									this._splatBudget = value;
 									if (this._placement) {
 											this._placement.splatBudget = this._splatBudget;
+									}
+							}
+					},
+					{
+							key: "cullDistance",
+							get: function get() {
+									return this._cullDistance;
+							},
+							set: function set(value) {
+									this._cullDistance = value;
+									if (this._placement) {
+											this._placement.cullDistance = this._cullDistance;
 									}
 							}
 					},

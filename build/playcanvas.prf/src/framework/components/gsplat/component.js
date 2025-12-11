@@ -22,7 +22,7 @@ class GSplatComponent extends Component {
 						50,
 						55,
 						60
-				], this._splatBudget = 0, this._customAabb = null, this._evtLayersChanged = null, this._evtLayerAdded = null, this._evtLayerRemoved = null, this._castShadows = false, this._unified = false;
+				], this._splatBudget = 0, this._cullDistance = 0, this._customAabb = null, this._evtLayersChanged = null, this._evtLayerAdded = null, this._evtLayerRemoved = null, this._castShadows = false, this._unified = false;
 				this._assetReference = new AssetReference('asset', this, system.app.assets, {
 						add: this._onGSplatAssetAdded,
 						load: this._onGSplatAssetLoad,
@@ -147,6 +147,15 @@ class GSplatComponent extends Component {
 		}
 		get splatBudget() {
 				return this._splatBudget;
+		}
+		set cullDistance(value) {
+				this._cullDistance = value;
+				if (this._placement) {
+						this._placement.cullDistance = this._cullDistance;
+				}
+		}
+		get cullDistance() {
+				return this._cullDistance;
 		}
 		set unified(value) {
 				if (this.enabled && this.entity.enabled) {
@@ -337,6 +346,7 @@ class GSplatComponent extends Component {
 								this._placement = new GSplatPlacement(asset.resource, this.entity);
 								this._placement.lodDistances = this._lodDistances;
 								this._placement.splatBudget = this._splatBudget;
+								this._placement.cullDistance = this._cullDistance;
 								if (this.enabled && this.entity.enabled) {
 										this.addToLayers();
 								}

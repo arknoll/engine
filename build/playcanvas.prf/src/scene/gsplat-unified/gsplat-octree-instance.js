@@ -151,6 +151,9 @@ class GSplatOctreeInstance {
 				return maxLod;
 		}
 		selectDesiredLodIndex(node, optimalLodIndex, maxLod, lodUnderfillLimit) {
+				if (optimalLodIndex < 0) {
+						return -1;
+				}
 				if (lodUnderfillLimit > 0) {
 						const allowedMaxCoarseLod = Math.min(maxLod, optimalLodIndex + lodUnderfillLimit);
 						for(let lod = optimalLodIndex; lod <= allowedMaxCoarseLod; lod++){
@@ -290,11 +293,21 @@ class GSplatOctreeInstance {
 										const nodeInfo = nodeInfos[nodeIndex];
 										const node = nodes[nodeIndex];
 										const currentOptimalLod = nodeInfo.optimalLod;
+										if (currentOptimalLod < 0) continue;
 										if (currentOptimalLod < rangeMax) {
 												const currentLod = node.lods[currentOptimalLod];
 												const nextLod = node.lods[currentOptimalLod + 1];
 												const splatsSaved = currentLod.count - nextLod.count;
 												nodeInfo.optimalLod += lodDelta;
+												currentSplats -= splatsSaved;
+												modified = true;
+												if (currentSplats <= splatBudget) {
+														break;
+												}
+										} else {
+												const currentLod = node.lods[currentOptimalLod];
+												const splatsSaved = currentLod.count;
+												nodeInfo.optimalLod = -1;
 												currentSplats -= splatsSaved;
 												modified = true;
 												if (currentSplats <= splatBudget) {
@@ -308,6 +321,19 @@ class GSplatOctreeInstance {
 										const nodeInfo = nodeInfos[nodeIndex];
 										const node = nodes[nodeIndex];
 										const currentOptimalLod = nodeInfo.optimalLod;
+										if (currentOptimalLod < 0) {
+												const maxLodData = node.lods[rangeMax];
+												const splatsAdded = maxLodData.count;
+												if (currentSplats + splatsAdded <= splatBudget) {
+														nodeInfo.optimalLod = rangeMax;
+														currentSplats += splatsAdded;
+														modified = true;
+														if (currentSplats >= splatBudget) {
+																break;
+														}
+												}
+												continue;
+										}
 										if (currentOptimalLod > rangeMin) {
 												const currentLod = node.lods[currentOptimalLod];
 												const nextLod = node.lods[currentOptimalLod - 1];

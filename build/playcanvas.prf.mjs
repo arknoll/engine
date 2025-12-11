@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision b1d2f5972 (PROFILE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 32c995bfc (PROFILE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = 'b1d2f5972';
+const revision = '32c995bfc';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -78222,6 +78222,7 @@ class GSplatPlacement {
 				this.lodIndex = 0;
 				this._lodDistances = null;
 				this.splatBudget = 0;
+				this.cullDistance = 0;
 				this._aabb = new BoundingBox();
 				this.resource = resource;
 				this.node = node;
@@ -78395,6 +78396,9 @@ class GSplatOctreeInstance {
 				return maxLod;
 		}
 		selectDesiredLodIndex(node, optimalLodIndex, maxLod, lodUnderfillLimit) {
+				if (optimalLodIndex < 0) {
+						return -1;
+				}
 				if (lodUnderfillLimit > 0) {
 						const allowedMaxCoarseLod = Math.min(maxLod, optimalLodIndex + lodUnderfillLimit);
 						for(let lod = optimalLodIndex; lod <= allowedMaxCoarseLod; lod++){
@@ -78534,11 +78538,21 @@ class GSplatOctreeInstance {
 										const nodeInfo = nodeInfos[nodeIndex];
 										const node = nodes[nodeIndex];
 										const currentOptimalLod = nodeInfo.optimalLod;
+										if (currentOptimalLod < 0) continue;
 										if (currentOptimalLod < rangeMax) {
 												const currentLod = node.lods[currentOptimalLod];
 												const nextLod = node.lods[currentOptimalLod + 1];
 												const splatsSaved = currentLod.count - nextLod.count;
 												nodeInfo.optimalLod += lodDelta;
+												currentSplats -= splatsSaved;
+												modified = true;
+												if (currentSplats <= splatBudget) {
+														break;
+												}
+										} else {
+												const currentLod = node.lods[currentOptimalLod];
+												const splatsSaved = currentLod.count;
+												nodeInfo.optimalLod = -1;
 												currentSplats -= splatsSaved;
 												modified = true;
 												if (currentSplats <= splatBudget) {
@@ -78552,6 +78566,19 @@ class GSplatOctreeInstance {
 										const nodeInfo = nodeInfos[nodeIndex];
 										const node = nodes[nodeIndex];
 										const currentOptimalLod = nodeInfo.optimalLod;
+										if (currentOptimalLod < 0) {
+												const maxLodData = node.lods[rangeMax];
+												const splatsAdded = maxLodData.count;
+												if (currentSplats + splatsAdded <= splatBudget) {
+														nodeInfo.optimalLod = rangeMax;
+														currentSplats += splatsAdded;
+														modified = true;
+														if (currentSplats >= splatBudget) {
+																break;
+														}
+												}
+												continue;
+										}
 										if (currentOptimalLod > rangeMin) {
 												const currentLod = node.lods[currentOptimalLod];
 												const nextLod = node.lods[currentOptimalLod - 1];
@@ -79746,7 +79773,7 @@ class GSplatComponent extends Component {
 						50,
 						55,
 						60
-				], this._splatBudget = 0, this._customAabb = null, this._evtLayersChanged = null, this._evtLayerAdded = null, this._evtLayerRemoved = null, this._castShadows = false, this._unified = false;
+				], this._splatBudget = 0, this._cullDistance = 0, this._customAabb = null, this._evtLayersChanged = null, this._evtLayerAdded = null, this._evtLayerRemoved = null, this._castShadows = false, this._unified = false;
 				this._assetReference = new AssetReference('asset', this, system.app.assets, {
 						add: this._onGSplatAssetAdded,
 						load: this._onGSplatAssetLoad,
@@ -79871,6 +79898,15 @@ class GSplatComponent extends Component {
 		}
 		get splatBudget() {
 				return this._splatBudget;
+		}
+		set cullDistance(value) {
+				this._cullDistance = value;
+				if (this._placement) {
+						this._placement.cullDistance = this._cullDistance;
+				}
+		}
+		get cullDistance() {
+				return this._cullDistance;
 		}
 		set unified(value) {
 				if (this.enabled && this.entity.enabled) {
@@ -80061,6 +80097,7 @@ class GSplatComponent extends Component {
 								this._placement = new GSplatPlacement(asset.resource, this.entity);
 								this._placement.lodDistances = this._lodDistances;
 								this._placement.splatBudget = this._splatBudget;
+								this._placement.cullDistance = this._cullDistance;
 								if (this.enabled && this.entity.enabled) {
 										this.addToLayers();
 								}
