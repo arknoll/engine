@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision a0f21eec8 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 5389349f3 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = 'a0f21eec8';
+const revision = '5389349f3';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -22333,6 +22333,11 @@ class GraphNode extends EventHandler {
 				}
 		}
 		setLocalPosition(x, y, z) {
+				if (this.name === 'Camera' || this.parent?.name === 'VRCameraParent') {
+						const newVal = x instanceof Vec3 ? `(${x.x.toFixed(3)}, ${x.y.toFixed(3)}, ${x.z.toFixed(3)})` : `(${x}, ${y}, ${z})`;
+						console.log(`📍 setLocalPosition on ${this.name}: ${newVal}`);
+						console.trace();
+				}
 				if (x instanceof Vec3) {
 						this.localPosition.copy(x);
 				} else {

@@ -311,6 +311,11 @@ class GraphNode extends EventHandler {
 				}
 		}
 		setLocalPosition(x, y, z) {
+				if (this.name === 'Camera' || this.parent?.name === 'VRCameraParent') {
+						const newVal = x instanceof Vec3 ? `(${x.x.toFixed(3)}, ${x.y.toFixed(3)}, ${x.z.toFixed(3)})` : `(${x}, ${y}, ${z})`;
+						console.log(`📍 setLocalPosition on ${this.name}: ${newVal}`);
+						console.trace();
+				}
 				if (x instanceof Vec3) {
 						this.localPosition.copy(x);
 				} else {

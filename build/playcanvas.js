@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision a0f21eec8 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 5389349f3 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = 'a0f21eec8';
+	var revision = '5389349f3';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -26038,6 +26038,12 @@
 					}
 			};
 			_proto.setLocalPosition = function setLocalPosition(x, y, z) {
+					var _this_parent;
+					if (this.name === 'Camera' || ((_this_parent = this.parent) == null ? void 0 : _this_parent.name) === 'VRCameraParent') {
+							var newVal = _instanceof$12(x, Vec3) ? "(" + x.x.toFixed(3) + ", " + x.y.toFixed(3) + ", " + x.z.toFixed(3) + ")" : "(" + x + ", " + y + ", " + z + ")";
+							console.log("\uD83D\uDCCD setLocalPosition on " + this.name + ": " + newVal);
+							console.trace();
+					}
 					if (_instanceof$12(x, Vec3)) {
 							this.localPosition.copy(x);
 					} else {
