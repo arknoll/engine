@@ -176,10 +176,6 @@ class GSplatManager {
         this.renderer = new GSplatRenderer(device, this.node, this.cameraNode, layer, this.workBuffer);
         this.sorter = this.createSorter();
         
-        // Debug: log when GSplatManager is created
-        const lp = cameraNode.localPosition;
-        const parent = cameraNode.parent?.name || 'null';
-        console.log(`🔧 GSplatManager CREATED: node=${cameraNode._guid} parent=${parent} localPos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
     }
 
     /**
@@ -468,13 +464,6 @@ class GSplatManager {
                 const angle = Math.acos(dot);
                 const rotThreshold = lodUpdateAngleDeg * math.DEG_TO_RAD;
                 cameraRotated = angle > rotThreshold;
-                // Debug: log forward vectors to see if they're updating
-                if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
-                    this._lastFwdLogTime = Date.now();
-                    const lp = this.cameraNode.localPosition;
-                    const wp = this.cameraNode.getPosition();
-                    console.log(`🎥 GSplat: Vec3ID=${lp._dbgId || 'NONE'} local=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)}) world=(${wp.x.toFixed(3)}, ${wp.y.toFixed(3)}, ${wp.z.toFixed(3)})`);
-                }
             } else {
                 // first run, force update to initialize last orientation
                 cameraRotated = true;
@@ -675,9 +664,7 @@ class GSplatManager {
 
             // update last camera data when LOD was evaluated
             this.lastLodCameraPos.copy(this.cameraNode.getPosition());
-            console.log('lastLodCameraPos', this.lastLodCameraPos);
             this.lastLodCameraFwd.copy(this.cameraNode.forward);
-            console.log('lastLodCameraFwd', this.lastLodCameraFwd);
 
             // update LOD for all octree instances
             for (const [, inst] of this.octreeInstances) {

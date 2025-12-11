@@ -103,9 +103,6 @@ class GSplatManager {
 				this.workBuffer = new GSplatWorkBuffer(device);
 				this.renderer = new GSplatRenderer(device, this.node, this.cameraNode, layer, this.workBuffer);
 				this.sorter = this.createSorter();
-				const lp = cameraNode.localPosition;
-				const parent = cameraNode.parent?.name || 'null';
-				console.log(`🔧 GSplatManager CREATED: node=${cameraNode._guid} parent=${parent} localPos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
 		}
 		setRenderMode(renderMode) {
 				this.renderMode = renderMode;
@@ -290,12 +287,6 @@ class GSplatManager {
 								const angle = Math.acos(dot);
 								const rotThreshold = lodUpdateAngleDeg * math.DEG_TO_RAD;
 								cameraRotated = angle > rotThreshold;
-								if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
-										this._lastFwdLogTime = Date.now();
-										const lp = this.cameraNode.localPosition;
-										const wp = this.cameraNode.getPosition();
-										console.log(`🎥 GSplat: Vec3ID=${lp._dbgId || 'NONE'} local=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)}) world=(${wp.x.toFixed(3)}, ${wp.y.toFixed(3)}, ${wp.z.toFixed(3)})`);
-								}
 						} else {
 								cameraRotated = true;
 						}
@@ -404,9 +395,7 @@ class GSplatManager {
 								inst.updateMoved();
 						}
 						this.lastLodCameraPos.copy(this.cameraNode.getPosition());
-						console.log('lastLodCameraPos', this.lastLodCameraPos);
 						this.lastLodCameraFwd.copy(this.cameraNode.forward);
-						console.log('lastLodCameraFwd', this.lastLodCameraFwd);
 						for (const [, inst] of this.octreeInstances){
 								inst.updateLod(this.cameraNode, this.scene.gsplat);
 						}

@@ -1017,21 +1017,6 @@ class ForwardRenderer extends Renderer {
         this.setSceneConstants();
 
         // update gsplat director
-        // DEBUG: Log ALL cameras in composition with GUID
-        if (this.gsplatDirector && (!this._lastCamLog || Date.now() - this._lastCamLog > 1000)) {
-            this._lastCamLog = Date.now();
-            console.log(`🎬 FwdRender: ${comp.cameras.length} camera(s)`);
-            for (let i = 0; i < comp.cameras.length; i++) {
-                const cam = comp.cameras[i];
-                if (cam?.camera?.node) {
-                    const node = cam.camera.node;
-                    const lp = node.localPosition;
-                    const parentName = node.parent?.name || 'null';
-                    const guid = node._guid?.slice(0, 8) || 'NO_GUID';
-                    console.log(`   [${i}] ${node.name} (${guid}): parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
-                }
-            }
-        }
         this.gsplatDirector?.update(comp);
 
         // visibility culling of lights, meshInstances, shadows casters

@@ -718,6 +718,7 @@ export class GraphNode extends EventHandler {
      * this.entity.setPosition(position);
      */
     setPosition(position: Vec3): void;
+    _lastSetPosLog: number;
     /**
      * Sets the world space rotation of the specified graph node.
      *

@@ -311,11 +311,6 @@ class GraphNode extends EventHandler {
 				}
 		}
 		setLocalPosition(x, y, z) {
-				if (this.name === 'Camera' || this.parent?.name === 'VRCameraParent') {
-						const newVal = x instanceof Vec3 ? `(${x.x.toFixed(3)}, ${x.y.toFixed(3)}, ${x.z.toFixed(3)})` : `(${x}, ${y}, ${z})`;
-						console.log(`📍 setLocalPosition on ${this.name}: ${newVal}`);
-						console.trace();
-				}
 				if (x instanceof Vec3) {
 						this.localPosition.copy(x);
 				} else {
@@ -386,9 +381,9 @@ class GraphNode extends EventHandler {
 				} else {
 						position.set(x, y, z);
 				}
-				if (this.name === 'Camera' || this.parent?.name === 'VRCameraParent') {
+				if ((this.name === 'Camera' || this.parent?.name === 'VRCameraParent') && (!this._lastSetPosLog || Date.now() - this._lastSetPosLog > 2000)) {
+						this._lastSetPosLog = Date.now();
 						console.log(`📌 setPosition on ${this.name}: world=(${position.x.toFixed(3)}, ${position.y.toFixed(3)}, ${position.z.toFixed(3)})`);
-						console.trace();
 				}
 				if (this._parent === null) {
 						this.localPosition.copy(position);

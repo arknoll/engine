@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 675d8ac96 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 437a66224 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = '675d8ac96';
+	var revision = '437a66224';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -26038,12 +26038,6 @@
 					}
 			};
 			_proto.setLocalPosition = function setLocalPosition(x, y, z) {
-					var _this_parent;
-					if (this.name === 'Camera' || ((_this_parent = this.parent) == null ? void 0 : _this_parent.name) === 'VRCameraParent') {
-							var newVal = _instanceof$12(x, Vec3) ? "(" + x.x.toFixed(3) + ", " + x.y.toFixed(3) + ", " + x.z.toFixed(3) + ")" : "(" + x + ", " + y + ", " + z + ")";
-							console.log("\uD83D\uDCCD setLocalPosition on " + this.name + ": " + newVal);
-							console.trace();
-					}
 					if (_instanceof$12(x, Vec3)) {
 							this.localPosition.copy(x);
 					} else {
@@ -26115,9 +26109,9 @@
 					} else {
 							position$3.set(x, y, z);
 					}
-					if (this.name === 'Camera' || ((_this_parent = this.parent) == null ? void 0 : _this_parent.name) === 'VRCameraParent') {
+					if ((this.name === 'Camera' || ((_this_parent = this.parent) == null ? void 0 : _this_parent.name) === 'VRCameraParent') && (!this._lastSetPosLog || Date.now() - this._lastSetPosLog > 2000)) {
+							this._lastSetPosLog = Date.now();
 							console.log("\uD83D\uDCCC setPosition on " + this.name + ": world=(" + position$3.x.toFixed(3) + ", " + position$3.y.toFixed(3) + ", " + position$3.z.toFixed(3) + ")");
-							console.trace();
 					}
 					if (this._parent === null) {
 							this.localPosition.copy(position$3);
@@ -30752,22 +30746,6 @@
 					this.collectLights(comp);
 					this.beginFrame(comp);
 					this.setSceneConstants();
-					if (this.gsplatDirector && (!this._lastCamLog || Date.now() - this._lastCamLog > 1000)) {
-							this._lastCamLog = Date.now();
-							console.log("\uD83C\uDFAC FwdRender: " + comp.cameras.length + " camera(s)");
-							for(var i = 0; i < comp.cameras.length; i++){
-									var _cam_camera;
-									var cam = comp.cameras[i];
-									if (cam == null ? void 0 : (_cam_camera = cam.camera) == null ? void 0 : _cam_camera.node) {
-											var _node_parent, _node__guid;
-											var node = cam.camera.node;
-											var lp = node.localPosition;
-											var parentName = ((_node_parent = node.parent) == null ? void 0 : _node_parent.name) || 'null';
-											var guid = ((_node__guid = node._guid) == null ? void 0 : _node__guid.slice(0, 8)) || 'NO_GUID';
-											console.log("   [" + i + "] " + node.name + " (" + guid + "): parent=" + parentName + " pos=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ")");
-									}
-							}
-					}
 					(_this_gsplatDirector = this.gsplatDirector) == null ? void 0 : _this_gsplatDirector.update(comp);
 					this.cullComposition(comp);
 					this.gpuUpdate(this.processingMeshInstances);
@@ -77824,25 +77802,17 @@
 							55,
 							60
 					];
-					console.log('🔍 updateLod called - placement.lodDistances:', this.placement.lodDistances, 'using:', lodDistances, 'maxLod:', maxLod);
 					var lodRangeMin = params.lodRangeMin, lodRangeMax = params.lodRangeMax;
 					var rangeMin = Math.max(0, Math.min(lodRangeMin != null ? lodRangeMin : 0, maxLod));
 					var rangeMax = Math.max(rangeMin, Math.min(lodRangeMax != null ? lodRangeMax : maxLod, maxLod));
 					var totalOptimalSplats = this.evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params);
 					if (this.splatBudget > 0) {
-							console.log("\uD83D\uDD22 Before enforceSplatBudget: totalOptimalSplats=" + totalOptimalSplats + ", this.splatBudget=" + this.splatBudget);
 							this.enforceSplatBudget(totalOptimalSplats, this.splatBudget, rangeMin, rangeMax);
-					} else {
-							console.log("⚠️ splatBudget is 0 or not set, skipping budget enforcement");
 					}
 					this.applyLodChanges(maxLod, params);
 			};
 			_proto.evaluateNodeLods = function evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params) {
 					var lodBehindPenalty = params.lodBehindPenalty;
-					if (!this._lastLoggedLodDistances || JSON.stringify(this._lastLoggedLodDistances) !== JSON.stringify(lodDistances)) {
-							console.log('📏 evaluateNodeLods - lodDistances:', lodDistances, 'maxLod:', maxLod, 'rangeMin:', rangeMin, 'rangeMax:', rangeMax);
-							this._lastLoggedLodDistances = [].concat(lodDistances);
-					}
 					var worldCameraPosition = cameraNode.getPosition();
 					var octreeWorldTransform = this.placement.node.getWorldTransform();
 					_invWorldMat.copy(octreeWorldTransform).invert();
@@ -77887,16 +77857,9 @@
 									totalSplats += lod1.count;
 							}
 					}
-					var lodCounts = {};
-					for(var i = 0; i < nodeInfos.length; i++){
-							var lod2 = nodeInfos[i].optimalLod;
-							lodCounts[lod2] = (lodCounts[lod2] || 0) + 1;
-					}
-					console.log('🎨 LOD distribution:', lodCounts, 'totalSplats:', totalSplats);
 					return totalSplats;
 			};
 			_proto.enforceSplatBudget = function enforceSplatBudget(totalSplats, splatBudget, rangeMin, rangeMax) {
-					console.log("\uD83C\uDFAF enforceSplatBudget called: totalSplats=" + totalSplats + ", splatBudget=" + splatBudget + ", rangeMin=" + rangeMin + ", rangeMax=" + rangeMax);
 					var nodes = this.octree.nodes;
 					var nodeInfos = this.nodeInfos;
 					if (!this._nodeIndices) {
@@ -77927,7 +77890,6 @@
 													var currentLod = node.lods[currentOptimalLod];
 													var nextLod = node.lods[currentOptimalLod + 1];
 													var splatsSaved = currentLod.count - nextLod.count;
-													console.log("\uD83D\uDD22 Degrading node index " + nodeIndex + " from LOD " + currentOptimalLod + " to " + (currentOptimalLod + 1) + ": " + splatsSaved + " splats saved");
 													nodeInfo.optimalLod += lodDelta;
 													currentSplats -= splatsSaved;
 													modified = true;
@@ -78106,7 +78068,6 @@
 			_proto.update = function update(scene) {
 					var currentBudget = this.placement.splatBudget;
 					if (currentBudget !== this.splatBudget) {
-							console.log("\uD83D\uDCB0 splatBudget changed: " + this.splatBudget + " -> " + currentBudget + " (from placement)");
 							this.splatBudget = currentBudget;
 							this.needsLodUpdate = true;
 					}
@@ -78662,7 +78623,6 @@
 	var _randomColorRaw = null;
 	var GSplatManager = /*#__PURE__*/ function() {
 			function GSplatManager(device, director, layer, cameraNode) {
-					var _cameraNode_parent;
 					this.node = new GraphNode('GSplatManager');
 					this.worldStates = new Map();
 					this.lastWorldStateVersion = 0;
@@ -78687,9 +78647,6 @@
 					this.workBuffer = new GSplatWorkBuffer(device);
 					this.renderer = new GSplatRenderer(device, this.node, this.cameraNode, layer, this.workBuffer);
 					this.sorter = this.createSorter();
-					var lp = cameraNode.localPosition;
-					var parent = ((_cameraNode_parent = cameraNode.parent) == null ? void 0 : _cameraNode_parent.name) || 'null';
-					console.log("\uD83D\uDD27 GSplatManager CREATED: node=" + cameraNode._guid + " parent=" + parent + " localPos=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ")");
 			}
 			var _proto = GSplatManager.prototype;
 			_proto.setRenderMode = function setRenderMode(renderMode) {
@@ -78890,12 +78847,6 @@
 									var angle = Math.acos(dot);
 									var rotThreshold = lodUpdateAngleDeg * math.DEG_TO_RAD;
 									cameraRotated = angle > rotThreshold;
-									if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
-											this._lastFwdLogTime = Date.now();
-											var lp = this.cameraNode.localPosition;
-											var wp = this.cameraNode.getPosition();
-											console.log("\uD83C\uDFA5 GSplat: Vec3ID=" + (lp._dbgId || 'NONE') + " local=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ") world=(" + wp.x.toFixed(3) + ", " + wp.y.toFixed(3) + ", " + wp.z.toFixed(3) + ")");
-									}
 							} else {
 									cameraRotated = true;
 							}
@@ -79011,9 +78962,7 @@
 									inst2.updateMoved();
 							}
 							this.lastLodCameraPos.copy(this.cameraNode.getPosition());
-							console.log('lastLodCameraPos', this.lastLodCameraPos);
 							this.lastLodCameraFwd.copy(this.cameraNode.forward);
-							console.log('lastLodCameraFwd', this.lastLodCameraFwd);
 							for(var _iterator3 = _create_for_of_iterator_helper_loose$j(this.octreeInstances), _step3; !(_step3 = _iterator3()).done;){
 									var _step_value3 = _step3.value, inst3 = _step_value3[1];
 									inst3.updateLod(this.cameraNode, this.scene.gsplat);
@@ -79791,14 +79740,9 @@
 									return this._lodDistances ? this._lodDistances.slice() : null;
 							},
 							set: function set(value) {
-									var _this_entity;
-									console.log("\uD83D\uDCD0 GSplatComponent.lodDistances SET:", value, 'entity:', (_this_entity = this.entity) == null ? void 0 : _this_entity.name);
 									this._lodDistances = Array.isArray(value) ? value.slice() : null;
 									if (this._placement) {
 											this._placement.lodDistances = this._lodDistances;
-											console.log("   → Applied to placement");
-									} else {
-											console.log("   ⚠️ No placement yet");
 									}
 							}
 					},
@@ -79808,14 +79752,9 @@
 									return this._splatBudget;
 							},
 							set: function set(value) {
-									var _this_entity;
-									console.log("\uD83C\uDFAE GSplatComponent.splatBudget SET: " + this._splatBudget + " -> " + value + ", entity: " + ((_this_entity = this.entity) == null ? void 0 : _this_entity.name));
 									this._splatBudget = value;
 									if (this._placement) {
 											this._placement.splatBudget = this._splatBudget;
-											console.log("   → Applied to placement");
-									} else {
-											console.log("   ⚠️ No placement yet, budget will be applied when placement is created");
 									}
 							}
 					},
@@ -94619,15 +94558,6 @@
 					}
 					this._camera.camera._node.setLocalPosition(this._localPosition);
 					this._camera.camera._node.setLocalRotation(this._localRotation);
-					var node = this._camera.camera._node;
-					if (!node.localPosition._dbgId) node.localPosition._dbgId = 'XR_' + Date.now();
-					if (!this._lastXrPosLog || Date.now() - this._lastXrPosLog > 1000) {
-							var _node_parent, _node__guid;
-							this._lastXrPosLog = Date.now();
-							var lp = node.localPosition;
-							var parentName = ((_node_parent = node.parent) == null ? void 0 : _node_parent.name) || 'null';
-							console.log("\uD83C\uDFAF XR: node=" + ((_node__guid = node._guid) == null ? void 0 : _node__guid.slice(0, 8)) + " parent=" + parentName + " pos=(" + lp.x.toFixed(3) + ", " + lp.y.toFixed(3) + ", " + lp.z.toFixed(3) + ")");
-					}
 					this.input.update(frame);
 					if (this._type === XRTYPE_AR) {
 							if (this.hitTest.supported) {

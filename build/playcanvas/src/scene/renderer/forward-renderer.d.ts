@@ -124,7 +124,6 @@ export class ForwardRenderer extends Renderer {
      * @param {LayerComposition} comp - The layer composition.
      */
     update(comp: LayerComposition): void;
-    _lastCamLog: number;
 }
 import { Renderer } from './renderer.js';
 import type { Scene } from '../scene.js';

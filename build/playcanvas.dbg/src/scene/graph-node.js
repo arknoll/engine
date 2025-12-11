@@ -834,12 +834,6 @@ const up = new Vec3();
      * @param {number} [y] - Y-coordinate of local space position.
      * @param {number} [z] - Z-coordinate of local space position.
      */ setLocalPosition(x, y, z) {
-        // DEBUG: Log any setLocalPosition calls on camera nodes
-        if (this.name === 'Camera' || this.parent?.name === 'VRCameraParent') {
-            const newVal = x instanceof Vec3 ? `(${x.x.toFixed(3)}, ${x.y.toFixed(3)}, ${x.z.toFixed(3)})` : `(${x}, ${y}, ${z})`;
-            console.log(`📍 setLocalPosition on ${this.name}: ${newVal}`);
-            console.trace();
-        }
         if (x instanceof Vec3) {
             this.localPosition.copy(x);
         } else {
@@ -981,10 +975,10 @@ const up = new Vec3();
         } else {
             position.set(x, y, z);
         }
-        // DEBUG: Log any setPosition calls on camera nodes
-        if (this.name === 'Camera' || this.parent?.name === 'VRCameraParent') {
+        // DEBUG: Log setPosition calls on camera nodes (throttled)
+        if ((this.name === 'Camera' || this.parent?.name === 'VRCameraParent') && (!this._lastSetPosLog || Date.now() - this._lastSetPosLog > 2000)) {
+            this._lastSetPosLog = Date.now();
             console.log(`📌 setPosition on ${this.name}: world=(${position.x.toFixed(3)}, ${position.y.toFixed(3)}, ${position.z.toFixed(3)})`);
-            console.trace();
         }
         if (this._parent === null) {
             this.localPosition.copy(position);

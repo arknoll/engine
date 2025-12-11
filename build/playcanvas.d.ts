@@ -13604,6 +13604,7 @@ declare class GraphNode extends EventHandler {
      * this.entity.setPosition(position);
      */
     setPosition(position: Vec3): void;
+    _lastSetPosLog: number;
     /**
      * Sets the world space rotation of the specified graph node.
      *
@@ -23236,7 +23237,6 @@ declare class XrManager extends EventHandler {
      * @ignore
      */
     update(frame: XRFrame): boolean;
-    _lastXrPosLog: number;
     /**
      * True if XR is supported.
      *
@@ -43738,7 +43738,6 @@ declare class GSplatOctreeInstance {
      * @private
      */
     private evaluateNodeLods;
-    _lastLoggedLodDistances: number[];
     /**
      * Adjusts optimal LOD indices to fit within the splat budget bidirectionally.
      * When over budget: degrades quality for lower-importance nodes first.
@@ -43956,7 +43955,6 @@ declare class GSplatManager {
      * @returns {boolean} True if camera moved/rotated over thresholds, otherwise false.
      */
     testCameraMovedForLod(): boolean;
-    _lastFwdLogTime: number;
     /**
      * Tests if the camera has moved enough to require re-sorting.
      * - For radial sorting: only position matters (rotation doesn't affect sort order)
@@ -44720,7 +44718,6 @@ declare class ForwardRenderer extends Renderer {
      * @param {LayerComposition} comp - The layer composition.
      */
     update(comp: LayerComposition): void;
-    _lastCamLog: number;
 }
 
 /**

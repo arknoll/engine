@@ -376,14 +376,6 @@ class XrManager extends EventHandler {
 				}
 				this._camera.camera._node.setLocalPosition(this._localPosition);
 				this._camera.camera._node.setLocalRotation(this._localRotation);
-				const node = this._camera.camera._node;
-				if (!node.localPosition._dbgId) node.localPosition._dbgId = 'XR_' + Date.now();
-				if (!this._lastXrPosLog || Date.now() - this._lastXrPosLog > 1000) {
-						this._lastXrPosLog = Date.now();
-						const lp = node.localPosition;
-						const parentName = node.parent?.name || 'null';
-						console.log(`🎯 XR: node=${node._guid?.slice(0, 8)} parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
-				}
 				this.input.update(frame);
 				if (this._type === XRTYPE_AR) {
 						if (this.hitTest.supported) {

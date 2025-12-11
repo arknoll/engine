@@ -391,13 +391,9 @@ class GSplatComponent extends Component {
      * @type {number[]|null}
      */
     set lodDistances(value) {
-        console.log(`📐 GSplatComponent.lodDistances SET:`, value, 'entity:', this.entity?.name);
         this._lodDistances = Array.isArray(value) ? value.slice() : null;
         if (this._placement) {
             this._placement.lodDistances = this._lodDistances;
-            console.log(`   → Applied to placement`);
-        } else {
-            console.log(`   ⚠️ No placement yet`);
         }
     }
 
@@ -427,13 +423,9 @@ class GSplatComponent extends Component {
      * @type {number}
      */
     set splatBudget(value) {
-        console.log(`🎮 GSplatComponent.splatBudget SET: ${this._splatBudget} -> ${value}, entity: ${this.entity?.name}`);
         this._splatBudget = value;
         if (this._placement) {
             this._placement.splatBudget = this._splatBudget;
-            console.log(`   → Applied to placement`);
-        } else {
-            console.log(`   ⚠️ No placement yet, budget will be applied when placement is created`);
         }
     }
 

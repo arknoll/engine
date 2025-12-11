@@ -665,20 +665,6 @@ class ForwardRenderer extends Renderer {
 				this.collectLights(comp);
 				this.beginFrame(comp);
 				this.setSceneConstants();
-				if (this.gsplatDirector && (!this._lastCamLog || Date.now() - this._lastCamLog > 1000)) {
-						this._lastCamLog = Date.now();
-						console.log(`🎬 FwdRender: ${comp.cameras.length} camera(s)`);
-						for(let i = 0; i < comp.cameras.length; i++){
-								const cam = comp.cameras[i];
-								if (cam?.camera?.node) {
-										const node = cam.camera.node;
-										const lp = node.localPosition;
-										const parentName = node.parent?.name || 'null';
-										const guid = node._guid?.slice(0, 8) || 'NO_GUID';
-										console.log(`   [${i}] ${node.name} (${guid}): parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
-								}
-						}
-				}
 				this.gsplatDirector?.update(comp);
 				this.cullComposition(comp);
 				this.gpuUpdate(this.processingMeshInstances);

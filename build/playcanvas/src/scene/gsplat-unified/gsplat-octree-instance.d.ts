@@ -174,7 +174,6 @@ export class GSplatOctreeInstance {
      * @private
      */
     private evaluateNodeLods;
-    _lastLoggedLodDistances: number[];
     /**
      * Adjusts optimal LOD indices to fit within the splat budget bidirectionally.
      * When over budget: degrades quality for lower-importance nodes first.

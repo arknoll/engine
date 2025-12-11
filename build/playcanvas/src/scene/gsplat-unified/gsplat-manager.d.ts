@@ -112,7 +112,6 @@ export class GSplatManager {
      * @returns {boolean} True if camera moved/rotated over thresholds, otherwise false.
      */
     testCameraMovedForLod(): boolean;
-    _lastFwdLogTime: number;
     /**
      * Tests if the camera has moved enough to require re-sorting.
      * - For radial sorting: only position matters (rotation doesn't affect sort order)

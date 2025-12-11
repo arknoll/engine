@@ -208,27 +208,17 @@ class GSplatOctreeInstance {
 						55,
 						60
 				];
-				console.log('🔍 updateLod called - placement.lodDistances:', this.placement.lodDistances, 'using:', lodDistances, 'maxLod:', maxLod);
 				const { lodRangeMin, lodRangeMax } = params;
 				const rangeMin = Math.max(0, Math.min(lodRangeMin ?? 0, maxLod));
 				const rangeMax = Math.max(rangeMin, Math.min(lodRangeMax ?? maxLod, maxLod));
 				const totalOptimalSplats = this.evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params);
 				if (this.splatBudget > 0) {
-						console.log(`🔢 Before enforceSplatBudget: totalOptimalSplats=${totalOptimalSplats}, this.splatBudget=${this.splatBudget}`);
 						this.enforceSplatBudget(totalOptimalSplats, this.splatBudget, rangeMin, rangeMax);
-				} else {
-						console.log(`⚠️ splatBudget is 0 or not set, skipping budget enforcement`);
 				}
 				this.applyLodChanges(maxLod, params);
 		}
 		evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params) {
 				const { lodBehindPenalty } = params;
-				if (!this._lastLoggedLodDistances || JSON.stringify(this._lastLoggedLodDistances) !== JSON.stringify(lodDistances)) {
-						console.log('📏 evaluateNodeLods - lodDistances:', lodDistances, 'maxLod:', maxLod, 'rangeMin:', rangeMin, 'rangeMax:', rangeMax);
-						this._lastLoggedLodDistances = [
-								...lodDistances
-						];
-				}
 				const worldCameraPosition = cameraNode.getPosition();
 				const octreeWorldTransform = this.placement.node.getWorldTransform();
 				_invWorldMat.copy(octreeWorldTransform).invert();
@@ -273,16 +263,9 @@ class GSplatOctreeInstance {
 								totalSplats += lod.count;
 						}
 				}
-				const lodCounts = {};
-				for(let i = 0; i < nodeInfos.length; i++){
-						const lod = nodeInfos[i].optimalLod;
-						lodCounts[lod] = (lodCounts[lod] || 0) + 1;
-				}
-				console.log('🎨 LOD distribution:', lodCounts, 'totalSplats:', totalSplats);
 				return totalSplats;
 		}
 		enforceSplatBudget(totalSplats, splatBudget, rangeMin, rangeMax) {
-				console.log(`🎯 enforceSplatBudget called: totalSplats=${totalSplats}, splatBudget=${splatBudget}, rangeMin=${rangeMin}, rangeMax=${rangeMax}`);
 				const nodes = this.octree.nodes;
 				const nodeInfos = this.nodeInfos;
 				if (!this._nodeIndices) {
@@ -311,7 +294,6 @@ class GSplatOctreeInstance {
 												const currentLod = node.lods[currentOptimalLod];
 												const nextLod = node.lods[currentOptimalLod + 1];
 												const splatsSaved = currentLod.count - nextLod.count;
-												console.log(`🔢 Degrading node index ${nodeIndex} from LOD ${currentOptimalLod} to ${currentOptimalLod + 1}: ${splatsSaved} splats saved`);
 												nodeInfo.optimalLod += lodDelta;
 												currentSplats -= splatsSaved;
 												modified = true;
@@ -490,7 +472,6 @@ class GSplatOctreeInstance {
 		update(scene) {
 				const currentBudget = this.placement.splatBudget;
 				if (currentBudget !== this.splatBudget) {
-						console.log(`💰 splatBudget changed: ${this.splatBudget} -> ${currentBudget} (from placement)`);
 						this.splatBudget = currentBudget;
 						this.needsLodUpdate = true;
 				}

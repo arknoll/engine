@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 675d8ac96 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision 437a66224 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = '675d8ac96';
+const revision = '437a66224';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -22333,11 +22333,6 @@ class GraphNode extends EventHandler {
 				}
 		}
 		setLocalPosition(x, y, z) {
-				if (this.name === 'Camera' || this.parent?.name === 'VRCameraParent') {
-						const newVal = x instanceof Vec3 ? `(${x.x.toFixed(3)}, ${x.y.toFixed(3)}, ${x.z.toFixed(3)})` : `(${x}, ${y}, ${z})`;
-						console.log(`📍 setLocalPosition on ${this.name}: ${newVal}`);
-						console.trace();
-				}
 				if (x instanceof Vec3) {
 						this.localPosition.copy(x);
 				} else {
@@ -22408,9 +22403,9 @@ class GraphNode extends EventHandler {
 				} else {
 						position$3.set(x, y, z);
 				}
-				if (this.name === 'Camera' || this.parent?.name === 'VRCameraParent') {
+				if ((this.name === 'Camera' || this.parent?.name === 'VRCameraParent') && (!this._lastSetPosLog || Date.now() - this._lastSetPosLog > 2000)) {
+						this._lastSetPosLog = Date.now();
 						console.log(`📌 setPosition on ${this.name}: world=(${position$3.x.toFixed(3)}, ${position$3.y.toFixed(3)}, ${position$3.z.toFixed(3)})`);
-						console.trace();
 				}
 				if (this._parent === null) {
 						this.localPosition.copy(position$3);
@@ -26421,20 +26416,6 @@ class ForwardRenderer extends Renderer {
 				this.collectLights(comp);
 				this.beginFrame(comp);
 				this.setSceneConstants();
-				if (this.gsplatDirector && (!this._lastCamLog || Date.now() - this._lastCamLog > 1000)) {
-						this._lastCamLog = Date.now();
-						console.log(`🎬 FwdRender: ${comp.cameras.length} camera(s)`);
-						for(let i = 0; i < comp.cameras.length; i++){
-								const cam = comp.cameras[i];
-								if (cam?.camera?.node) {
-										const node = cam.camera.node;
-										const lp = node.localPosition;
-										const parentName = node.parent?.name || 'null';
-										const guid = node._guid?.slice(0, 8) || 'NO_GUID';
-										console.log(`   [${i}] ${node.name} (${guid}): parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
-								}
-						}
-				}
 				this.gsplatDirector?.update(comp);
 				this.cullComposition(comp);
 				this.gpuUpdate(this.processingMeshInstances);
@@ -78298,27 +78279,17 @@ class GSplatOctreeInstance {
 						55,
 						60
 				];
-				console.log('🔍 updateLod called - placement.lodDistances:', this.placement.lodDistances, 'using:', lodDistances, 'maxLod:', maxLod);
 				const { lodRangeMin, lodRangeMax } = params;
 				const rangeMin = Math.max(0, Math.min(lodRangeMin ?? 0, maxLod));
 				const rangeMax = Math.max(rangeMin, Math.min(lodRangeMax ?? maxLod, maxLod));
 				const totalOptimalSplats = this.evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params);
 				if (this.splatBudget > 0) {
-						console.log(`🔢 Before enforceSplatBudget: totalOptimalSplats=${totalOptimalSplats}, this.splatBudget=${this.splatBudget}`);
 						this.enforceSplatBudget(totalOptimalSplats, this.splatBudget, rangeMin, rangeMax);
-				} else {
-						console.log(`⚠️ splatBudget is 0 or not set, skipping budget enforcement`);
 				}
 				this.applyLodChanges(maxLod, params);
 		}
 		evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params) {
 				const { lodBehindPenalty } = params;
-				if (!this._lastLoggedLodDistances || JSON.stringify(this._lastLoggedLodDistances) !== JSON.stringify(lodDistances)) {
-						console.log('📏 evaluateNodeLods - lodDistances:', lodDistances, 'maxLod:', maxLod, 'rangeMin:', rangeMin, 'rangeMax:', rangeMax);
-						this._lastLoggedLodDistances = [
-								...lodDistances
-						];
-				}
 				const worldCameraPosition = cameraNode.getPosition();
 				const octreeWorldTransform = this.placement.node.getWorldTransform();
 				_invWorldMat.copy(octreeWorldTransform).invert();
@@ -78363,16 +78334,9 @@ class GSplatOctreeInstance {
 								totalSplats += lod.count;
 						}
 				}
-				const lodCounts = {};
-				for(let i = 0; i < nodeInfos.length; i++){
-						const lod = nodeInfos[i].optimalLod;
-						lodCounts[lod] = (lodCounts[lod] || 0) + 1;
-				}
-				console.log('🎨 LOD distribution:', lodCounts, 'totalSplats:', totalSplats);
 				return totalSplats;
 		}
 		enforceSplatBudget(totalSplats, splatBudget, rangeMin, rangeMax) {
-				console.log(`🎯 enforceSplatBudget called: totalSplats=${totalSplats}, splatBudget=${splatBudget}, rangeMin=${rangeMin}, rangeMax=${rangeMax}`);
 				const nodes = this.octree.nodes;
 				const nodeInfos = this.nodeInfos;
 				if (!this._nodeIndices) {
@@ -78401,7 +78365,6 @@ class GSplatOctreeInstance {
 												const currentLod = node.lods[currentOptimalLod];
 												const nextLod = node.lods[currentOptimalLod + 1];
 												const splatsSaved = currentLod.count - nextLod.count;
-												console.log(`🔢 Degrading node index ${nodeIndex} from LOD ${currentOptimalLod} to ${currentOptimalLod + 1}: ${splatsSaved} splats saved`);
 												nodeInfo.optimalLod += lodDelta;
 												currentSplats -= splatsSaved;
 												modified = true;
@@ -78580,7 +78543,6 @@ class GSplatOctreeInstance {
 		update(scene) {
 				const currentBudget = this.placement.splatBudget;
 				if (currentBudget !== this.splatBudget) {
-						console.log(`💰 splatBudget changed: ${this.splatBudget} -> ${currentBudget} (from placement)`);
 						this.splatBudget = currentBudget;
 						this.needsLodUpdate = true;
 				}
@@ -79005,9 +78967,6 @@ class GSplatManager {
 				this.workBuffer = new GSplatWorkBuffer(device);
 				this.renderer = new GSplatRenderer(device, this.node, this.cameraNode, layer, this.workBuffer);
 				this.sorter = this.createSorter();
-				const lp = cameraNode.localPosition;
-				const parent = cameraNode.parent?.name || 'null';
-				console.log(`🔧 GSplatManager CREATED: node=${cameraNode._guid} parent=${parent} localPos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
 		}
 		setRenderMode(renderMode) {
 				this.renderMode = renderMode;
@@ -79192,12 +79151,6 @@ class GSplatManager {
 								const angle = Math.acos(dot);
 								const rotThreshold = lodUpdateAngleDeg * math.DEG_TO_RAD;
 								cameraRotated = angle > rotThreshold;
-								if (this._lastFwdLogTime === undefined || Date.now() - this._lastFwdLogTime > 1000) {
-										this._lastFwdLogTime = Date.now();
-										const lp = this.cameraNode.localPosition;
-										const wp = this.cameraNode.getPosition();
-										console.log(`🎥 GSplat: Vec3ID=${lp._dbgId || 'NONE'} local=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)}) world=(${wp.x.toFixed(3)}, ${wp.y.toFixed(3)}, ${wp.z.toFixed(3)})`);
-								}
 						} else {
 								cameraRotated = true;
 						}
@@ -79306,9 +79259,7 @@ class GSplatManager {
 								inst.updateMoved();
 						}
 						this.lastLodCameraPos.copy(this.cameraNode.getPosition());
-						console.log('lastLodCameraPos', this.lastLodCameraPos);
 						this.lastLodCameraFwd.copy(this.cameraNode.forward);
-						console.log('lastLodCameraFwd', this.lastLodCameraFwd);
 						for (const [, inst] of this.octreeInstances){
 								inst.updateLod(this.cameraNode, this.scene.gsplat);
 						}
@@ -79732,26 +79683,18 @@ class GSplatComponent extends Component {
 				return this._castShadows;
 		}
 		set lodDistances(value) {
-				console.log(`📐 GSplatComponent.lodDistances SET:`, value, 'entity:', this.entity?.name);
 				this._lodDistances = Array.isArray(value) ? value.slice() : null;
 				if (this._placement) {
 						this._placement.lodDistances = this._lodDistances;
-						console.log(`   → Applied to placement`);
-				} else {
-						console.log(`   ⚠️ No placement yet`);
 				}
 		}
 		get lodDistances() {
 				return this._lodDistances ? this._lodDistances.slice() : null;
 		}
 		set splatBudget(value) {
-				console.log(`🎮 GSplatComponent.splatBudget SET: ${this._splatBudget} -> ${value}, entity: ${this.entity?.name}`);
 				this._splatBudget = value;
 				if (this._placement) {
 						this._placement.splatBudget = this._splatBudget;
-						console.log(`   → Applied to placement`);
-				} else {
-						console.log(`   ⚠️ No placement yet, budget will be applied when placement is created`);
 				}
 		}
 		get splatBudget() {
@@ -92406,14 +92349,6 @@ class XrManager extends EventHandler {
 				}
 				this._camera.camera._node.setLocalPosition(this._localPosition);
 				this._camera.camera._node.setLocalRotation(this._localRotation);
-				const node = this._camera.camera._node;
-				if (!node.localPosition._dbgId) node.localPosition._dbgId = 'XR_' + Date.now();
-				if (!this._lastXrPosLog || Date.now() - this._lastXrPosLog > 1000) {
-						this._lastXrPosLog = Date.now();
-						const lp = node.localPosition;
-						const parentName = node.parent?.name || 'null';
-						console.log(`🎯 XR: node=${node._guid?.slice(0, 8)} parent=${parentName} pos=(${lp.x.toFixed(3)}, ${lp.y.toFixed(3)}, ${lp.z.toFixed(3)})`);
-				}
 				this.input.update(frame);
 				if (this._type === XRTYPE_AR) {
 						if (this.hitTest.supported) {
