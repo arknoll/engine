@@ -532,7 +532,7 @@ class GSplatOctreeInstance {
      * @private
      */
     evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params) {
-        const { lodBehindPenalty } = params;
+        const { lodBehindPenalty, lodPenaltyStartAngle = 90 } = params;
 
         // transform camera position to octree local space
         const worldCameraPosition = cameraNode.getPosition();
@@ -549,6 +549,11 @@ class GSplatOctreeInstance {
         // Use distance threshold for max LOD range to normalize importance
         const maxDistance = lodDistances[rangeMax] || 100;
 
+        // Convert start angle to cosine threshold (cos decreases as angle increases)
+        // cos(0°) = 1, cos(90°) = 0, cos(180°) = -1
+        const startAngleRad = lodPenaltyStartAngle * Math.PI / 180;
+        const cosStartAngle = Math.cos(startAngleRad);
+
         for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++) {
             const node = nodes[nodeIndex];
 
@@ -559,17 +564,20 @@ class GSplatOctreeInstance {
             _dirToNode.sub(localCameraPosition);
             const actualDistance = _dirToNode.length();
 
-            // Apply angular-based multiplier for nodes behind the camera when enabled
+            // Apply angular-based multiplier for nodes outside the forward cone
             let penalizedDistance = actualDistance;
             let importanceMultiplier = 1.0;
 
             if (lodBehindPenalty > 1 && actualDistance > 0.01) {
-                // dot using unnormalized direction to avoid extra normalize; divide by distance
-                const dotOverDistance = localCameraForward.dot(_dirToNode) / actualDistance;
+                // Calculate cosine of angle between forward and direction to node
+                const cosAngle = localCameraForward.dot(_dirToNode) / actualDistance;
 
-                // Only apply penalty when behind the camera (dot < 0)
-                if (dotOverDistance < 0) {
-                    const t = -dotOverDistance; // 0 .. 1 for front -> directly behind
+                // Apply penalty when outside the forward cone (cosAngle < cosStartAngle)
+                // cosStartAngle = cos(startAngle), e.g., cos(45°) ≈ 0.707, cos(90°) = 0
+                if (cosAngle < cosStartAngle) {
+                    // t ranges from 0 at startAngle to 1 at 180°
+                    // cosAngle ranges from cosStartAngle down to -1
+                    const t = (cosStartAngle - cosAngle) / (cosStartAngle + 1);
                     const factor = 1 + t * (lodBehindPenalty - 1);
                     penalizedDistance = actualDistance * factor;
                     importanceMultiplier = 1.0 / factor; // inverse for importance

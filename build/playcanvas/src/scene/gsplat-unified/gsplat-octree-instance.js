@@ -254,7 +254,7 @@ class GSplatOctreeInstance {
 				this.applyLodChanges(maxLod, params);
 		}
 		evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params) {
-				const { lodBehindPenalty } = params;
+				const { lodBehindPenalty, lodPenaltyStartAngle = 90 } = params;
 				const worldCameraPosition = cameraNode.getPosition();
 				const octreeWorldTransform = this.placement.node.getWorldTransform();
 				_invWorldMat.copy(octreeWorldTransform).invert();
@@ -265,6 +265,8 @@ class GSplatOctreeInstance {
 				const nodeInfos = this.nodeInfos;
 				let totalSplats = 0;
 				const maxDistance = lodDistances[rangeMax] || 100;
+				const startAngleRad = lodPenaltyStartAngle * Math.PI / 180;
+				const cosStartAngle = Math.cos(startAngleRad);
 				for(let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++){
 						const node = nodes[nodeIndex];
 						node.bounds.closestPoint(localCameraPosition, _dirToNode);
@@ -273,9 +275,9 @@ class GSplatOctreeInstance {
 						let penalizedDistance = actualDistance;
 						let importanceMultiplier = 1.0;
 						if (lodBehindPenalty > 1 && actualDistance > 0.01) {
-								const dotOverDistance = localCameraForward.dot(_dirToNode) / actualDistance;
-								if (dotOverDistance < 0) {
-										const t = -dotOverDistance;
+								const cosAngle = localCameraForward.dot(_dirToNode) / actualDistance;
+								if (cosAngle < cosStartAngle) {
+										const t = (cosStartAngle - cosAngle) / (cosStartAngle + 1);
 										const factor = 1 + t * (lodBehindPenalty - 1);
 										penalizedDistance = actualDistance * factor;
 										importanceMultiplier = 1.0 / factor;

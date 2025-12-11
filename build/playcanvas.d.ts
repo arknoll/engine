@@ -15810,6 +15810,28 @@ declare class GSplatParams {
      * @type {number}
      * @private
      */
+    private _lodPenaltyStartAngle;
+    /**
+     * Angle in degrees from forward direction at which the LOD penalty starts to apply.
+     * Nodes within this angle from forward get no penalty. Nodes outside get a penalty
+     * that ramps from 1.0 at this angle to lodBehindPenalty at 180°.
+     *
+     * Default is 90 (only behind camera gets penalty). Set lower for VR to penalize
+     * peripheral vision, e.g., 45 means penalty starts at 45° from forward.
+     *
+     * @type {number}
+     */
+    set lodPenaltyStartAngle(value: number);
+    /**
+     * Gets the angle at which LOD penalty starts.
+     *
+     * @type {number}
+     */
+    get lodPenaltyStartAngle(): number;
+    /**
+     * @type {number}
+     * @private
+     */
     private _lodRangeMin;
     /**
      * Minimum allowed LOD index (inclusive). Defaults to 0.

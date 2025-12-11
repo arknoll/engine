@@ -19,6 +19,15 @@ class GSplatParams {
 		get lodBehindPenalty() {
 				return this._lodBehindPenalty;
 		}
+		set lodPenaltyStartAngle(value) {
+				if (this._lodPenaltyStartAngle !== value) {
+						this._lodPenaltyStartAngle = Math.max(0, Math.min(180, value));
+						this.dirty = true;
+				}
+		}
+		get lodPenaltyStartAngle() {
+				return this._lodPenaltyStartAngle;
+		}
 		set lodRangeMin(value) {
 				if (this._lodRangeMin !== value) {
 						this._lodRangeMin = value;
@@ -76,6 +85,7 @@ class GSplatParams {
 				this.lodUpdateDistance = 1;
 				this.lodUpdateAngle = 0;
 				this._lodBehindPenalty = 1;
+				this._lodPenaltyStartAngle = 90;
 				this._lodRangeMin = 0;
 				this._lodRangeMax = 10;
 				this._lodUnderfillLimit = 0;

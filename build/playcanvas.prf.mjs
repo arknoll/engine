@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 61b31d871 (PROFILE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision a80a70770 (PROFILE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = '61b31d871';
+const revision = 'a80a70770';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -30617,6 +30617,15 @@ class GSplatParams {
 		get lodBehindPenalty() {
 				return this._lodBehindPenalty;
 		}
+		set lodPenaltyStartAngle(value) {
+				if (this._lodPenaltyStartAngle !== value) {
+						this._lodPenaltyStartAngle = Math.max(0, Math.min(180, value));
+						this.dirty = true;
+				}
+		}
+		get lodPenaltyStartAngle() {
+				return this._lodPenaltyStartAngle;
+		}
 		set lodRangeMin(value) {
 				if (this._lodRangeMin !== value) {
 						this._lodRangeMin = value;
@@ -30674,6 +30683,7 @@ class GSplatParams {
 				this.lodUpdateDistance = 1;
 				this.lodUpdateAngle = 0;
 				this._lodBehindPenalty = 1;
+				this._lodPenaltyStartAngle = 90;
 				this._lodRangeMin = 0;
 				this._lodRangeMax = 10;
 				this._lodUnderfillLimit = 0;
@@ -78499,7 +78509,7 @@ class GSplatOctreeInstance {
 				this.applyLodChanges(maxLod, params);
 		}
 		evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params) {
-				const { lodBehindPenalty } = params;
+				const { lodBehindPenalty, lodPenaltyStartAngle = 90 } = params;
 				const worldCameraPosition = cameraNode.getPosition();
 				const octreeWorldTransform = this.placement.node.getWorldTransform();
 				_invWorldMat.copy(octreeWorldTransform).invert();
@@ -78510,6 +78520,8 @@ class GSplatOctreeInstance {
 				const nodeInfos = this.nodeInfos;
 				let totalSplats = 0;
 				const maxDistance = lodDistances[rangeMax] || 100;
+				const startAngleRad = lodPenaltyStartAngle * Math.PI / 180;
+				const cosStartAngle = Math.cos(startAngleRad);
 				for(let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++){
 						const node = nodes[nodeIndex];
 						node.bounds.closestPoint(localCameraPosition, _dirToNode);
@@ -78518,9 +78530,9 @@ class GSplatOctreeInstance {
 						let penalizedDistance = actualDistance;
 						let importanceMultiplier = 1.0;
 						if (lodBehindPenalty > 1 && actualDistance > 0.01) {
-								const dotOverDistance = localCameraForward.dot(_dirToNode) / actualDistance;
-								if (dotOverDistance < 0) {
-										const t = -dotOverDistance;
+								const cosAngle = localCameraForward.dot(_dirToNode) / actualDistance;
+								if (cosAngle < cosStartAngle) {
+										const t = (cosStartAngle - cosAngle) / (cosStartAngle + 1);
 										const factor = 1 + t * (lodBehindPenalty - 1);
 										penalizedDistance = actualDistance * factor;
 										importanceMultiplier = 1.0 / factor;

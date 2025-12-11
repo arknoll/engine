@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 61b31d871 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision a80a70770 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = '61b31d871';
+	var revision = 'a80a70770';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -35320,6 +35320,7 @@
 					this.lodUpdateDistance = 1;
 					this.lodUpdateAngle = 0;
 					this._lodBehindPenalty = 1;
+					this._lodPenaltyStartAngle = 90;
 					this._lodRangeMin = 0;
 					this._lodRangeMax = 10;
 					this._lodUnderfillLimit = 0;
@@ -35358,6 +35359,18 @@
 							set: function set(value) {
 									if (this._lodBehindPenalty !== value) {
 											this._lodBehindPenalty = value;
+											this.dirty = true;
+									}
+							}
+					},
+					{
+							key: "lodPenaltyStartAngle",
+							get: function get() {
+									return this._lodPenaltyStartAngle;
+							},
+							set: function set(value) {
+									if (this._lodPenaltyStartAngle !== value) {
+											this._lodPenaltyStartAngle = Math.max(0, Math.min(180, value));
 											this.dirty = true;
 									}
 							}
@@ -77849,7 +77862,7 @@
 					this.applyLodChanges(maxLod, params);
 			};
 			_proto.evaluateNodeLods = function evaluateNodeLods(cameraNode, maxLod, lodDistances, rangeMin, rangeMax, params) {
-					var lodBehindPenalty = params.lodBehindPenalty;
+					var lodBehindPenalty = params.lodBehindPenalty, _params_lodPenaltyStartAngle = params.lodPenaltyStartAngle, lodPenaltyStartAngle = _params_lodPenaltyStartAngle === void 0 ? 90 : _params_lodPenaltyStartAngle;
 					var worldCameraPosition = cameraNode.getPosition();
 					var octreeWorldTransform = this.placement.node.getWorldTransform();
 					_invWorldMat.copy(octreeWorldTransform).invert();
@@ -77860,6 +77873,8 @@
 					var nodeInfos = this.nodeInfos;
 					var totalSplats = 0;
 					var maxDistance = lodDistances[rangeMax] || 100;
+					var startAngleRad = lodPenaltyStartAngle * Math.PI / 180;
+					var cosStartAngle = Math.cos(startAngleRad);
 					for(var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++){
 							var node = nodes[nodeIndex];
 							node.bounds.closestPoint(localCameraPosition, _dirToNode);
@@ -77868,9 +77883,9 @@
 							var penalizedDistance = actualDistance;
 							var importanceMultiplier = 1.0;
 							if (lodBehindPenalty > 1 && actualDistance > 0.01) {
-									var dotOverDistance = localCameraForward.dot(_dirToNode) / actualDistance;
-									if (dotOverDistance < 0) {
-											var t = -dotOverDistance;
+									var cosAngle = localCameraForward.dot(_dirToNode) / actualDistance;
+									if (cosAngle < cosStartAngle) {
+											var t = (cosStartAngle - cosAngle) / (cosStartAngle + 1);
 											var factor = 1 + t * (lodBehindPenalty - 1);
 											penalizedDistance = actualDistance * factor;
 											importanceMultiplier = 1.0 / factor;

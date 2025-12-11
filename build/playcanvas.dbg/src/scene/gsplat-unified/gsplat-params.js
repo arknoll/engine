@@ -49,6 +49,28 @@ import { ShaderMaterial } from '../materials/shader-material.js';
         return this._lodBehindPenalty;
     }
     /**
+     * Angle in degrees from forward direction at which the LOD penalty starts to apply.
+     * Nodes within this angle from forward get no penalty. Nodes outside get a penalty
+     * that ramps from 1.0 at this angle to lodBehindPenalty at 180°.
+     *
+     * Default is 90 (only behind camera gets penalty). Set lower for VR to penalize
+     * peripheral vision, e.g., 45 means penalty starts at 45° from forward.
+     *
+     * @type {number}
+     */ set lodPenaltyStartAngle(value) {
+        if (this._lodPenaltyStartAngle !== value) {
+            this._lodPenaltyStartAngle = Math.max(0, Math.min(180, value));
+            this.dirty = true;
+        }
+    }
+    /**
+     * Gets the angle at which LOD penalty starts.
+     *
+     * @type {number}
+     */ get lodPenaltyStartAngle() {
+        return this._lodPenaltyStartAngle;
+    }
+    /**
      * Minimum allowed LOD index (inclusive). Defaults to 0.
      *
      * @type {number}
@@ -201,6 +223,10 @@ import { ShaderMaterial } from '../materials/shader-material.js';
      * @type {number}
      * @private
      */ this._lodBehindPenalty = 1;
+        /**
+     * @type {number}
+     * @private
+     */ this._lodPenaltyStartAngle = 90;
         /**
      * @type {number}
      * @private
