@@ -19,7 +19,6 @@ class GSplatLayerData {
 		}
 		updateConfiguration(device, director, layer, camera) {
 				const cameraNode = camera.node;
-				console.log(`📷 GSplatLayerData.updateConfiguration: camera.node._guid=${cameraNode?._guid} parent=${cameraNode?.parent?.name}`);
 				const hasNormalPlacements = layer.gsplatPlacements.length > 0;
 				const hasShadowCasters = layer.gsplatShadowCasters.length > 0;
 				const setsEqual = SetUtils.equals(layer.gsplatPlacementsSet, layer.gsplatShadowCastersSet);

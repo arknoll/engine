@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 437a66224 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision b1d2f5972 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -32,7 +32,7 @@ const TRACEID_OCTREE_RESOURCES = 'OctreeResources';
 const TRACEID_GPU_TIMINGS = 'GpuTimings';
 
 const version = '2.15.0-beta.0';
-const revision = '437a66224';
+const revision = 'b1d2f5972';
 function extend(target, ex) {
 		for(const prop in ex){
 				const copy = ex[prop];
@@ -79407,7 +79407,6 @@ class GSplatLayerData {
 		}
 		updateConfiguration(device, director, layer, camera) {
 				const cameraNode = camera.node;
-				console.log(`📷 GSplatLayerData.updateConfiguration: camera.node._guid=${cameraNode?._guid} parent=${cameraNode?.parent?.name}`);
 				const hasNormalPlacements = layer.gsplatPlacements.length > 0;
 				const hasShadowCasters = layer.gsplatShadowCasters.length > 0;
 				const setsEqual = SetUtils.equals(layer.gsplatPlacementsSet, layer.gsplatShadowCastersSet);

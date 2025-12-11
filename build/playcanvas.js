@@ -1,6 +1,6 @@
 /**
  * @license
- * PlayCanvas Engine v2.15.0-beta.0 revision 437a66224 (RELEASE)
+ * PlayCanvas Engine v2.15.0-beta.0 revision b1d2f5972 (RELEASE)
  * Copyright 2011-2025 PlayCanvas Ltd. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
@@ -299,7 +299,7 @@
 			return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	}
 	var version = '2.15.0-beta.0';
-	var revision = '437a66224';
+	var revision = 'b1d2f5972';
 	function extend(target, ex) {
 			for(var prop in ex){
 					var copy = ex[prop];
@@ -79199,9 +79199,7 @@
 					return manager;
 			};
 			_proto.updateConfiguration = function updateConfiguration(device, director, layer, camera) {
-					var _cameraNode_parent;
 					var cameraNode = camera.node;
-					console.log("\uD83D\uDCF7 GSplatLayerData.updateConfiguration: camera.node._guid=" + (cameraNode == null ? void 0 : cameraNode._guid) + " parent=" + (cameraNode == null ? void 0 : (_cameraNode_parent = cameraNode.parent) == null ? void 0 : _cameraNode_parent.name));
 					var hasNormalPlacements = layer.gsplatPlacements.length > 0;
 					var hasShadowCasters = layer.gsplatShadowCasters.length > 0;
 					var setsEqual = SetUtils.equals(layer.gsplatPlacementsSet, layer.gsplatShadowCastersSet);

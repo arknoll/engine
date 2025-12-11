@@ -60,7 +60,6 @@ import { GSPLAT_FORWARD, GSPLAT_SHADOW } from '../constants.js';
      * @param {Camera} camera - The camera.
      */ updateConfiguration(device, director, layer, camera) {
         const cameraNode = camera.node;
-        console.log(`📷 GSplatLayerData.updateConfiguration: camera.node._guid=${cameraNode?._guid} parent=${cameraNode?.parent?.name}`);
         const hasNormalPlacements = layer.gsplatPlacements.length > 0;
         const hasShadowCasters = layer.gsplatShadowCasters.length > 0;
         // Determine desired configuration
